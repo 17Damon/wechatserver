@@ -38,7 +38,7 @@ server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
 
 // 微信服务器返回的ack信息是HTTP的GET方法实现的
-server.get('/weixin/ack', function (req, res) {
+server.get('/', function (req, res) {
     var data = nodeWeixinAuth.extract(req.query);
     nodeWeixinAuth.ack(app.token, data, function (error, data) {
         if (!error) {
