@@ -9,21 +9,21 @@ var app = {
     token: 'zhubg'
 };
 
-//手动得到accessToken
-nodeWeixinAuth.tokenize(settings, app, function (error, json) {
-    var accessToken = json.access_token;
-});
-
-//自动获得accessToken，并发送需要accessToken的请求
-nodeWeixinAuth.determine(settings, app, function () {
-    //这里添加发送请求的代码
-});
-
-//获取服务器IP
-nodeWeixinAuth.ips(settings, app, function (error, data) {
-    //error == false
-    //data.ip_list获取IP列表
-});
+// //手动得到accessToken
+// nodeWeixinAuth.tokenize(settings, app, function (error, json) {
+//     var accessToken = json.access_token;
+// });
+//
+// //自动获得accessToken，并发送需要accessToken的请求
+// nodeWeixinAuth.determine(settings, app, function () {
+//     //这里添加发送请求的代码
+// });
+//
+// //获取服务器IP
+// nodeWeixinAuth.ips(settings, app, function (error, data) {
+//     //error == false
+//     //data.ip_list获取IP列表
+// });
 
 
 //与微信对接服务器的验证
@@ -43,18 +43,21 @@ server.get('/weixin/ack', function (req, res) {
     nodeWeixinAuth.ack(app.token, data, function (error, data) {
         if (!error) {
             res.send(data);
-            console.log('connetct done!');
+            console.log('connetct done!:'+data);
             return;
         }
         switch (error) {
             case 1:
                 res.send(errors.INPUT_INVALID);
+                console.log(errors.INPUT_INVALID);
                 break;
             case 2:
                 res.send(errors.SIGNATURE_NOT_MATCH);
+                console.log(errors.SIGNATURE_NOT_MATCH);
                 break;
             default:
                 res.send(errors.UNKNOWN_ERROR);
+                console.log(errors.UNKNOWN_ERROR);
                 break;
         }
     });
