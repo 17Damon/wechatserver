@@ -38,7 +38,7 @@ server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
 
 // 微信服务器返回的ack信息是HTTP的GET方法实现的
-server.get('/', function (req, res) {
+server.get('/ack', function (req, res) {
     var data = nodeWeixinAuth.extract(req.query);
     nodeWeixinAuth.ack(app.token, data, function (error, data) {
         if (!error) {
@@ -61,6 +61,21 @@ server.get('/', function (req, res) {
                 break;
         }
     });
+});
+
+server.get('/', function (req, res) {
+            // res.redirect('https://github.com/miss61008596');
+            res.send(`<html>
+<body>
+<div style="display: flex;flex-direction: row;justify-content: center;align-items: center">
+<div style="display: flex;flex-direction: column;">
+<h1>个人技术分享</h1>
+<h1>请访问我的github主页</h1><a href="https://github.com/miss61008596">https://github.com/miss61008596</a>
+<h5>QQ:61008596</h5>
+</div>
+</div>
+</body>
+</html>`);
 });
 
 var  listener = server.listen(80, function () {
