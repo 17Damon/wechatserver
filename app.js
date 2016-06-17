@@ -76,8 +76,6 @@ server.get('/test', function (req, res) {
         //通过code换取网页授权access_token
         nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`,
             function (data, status, headers) {
-                console.log(status);
-                console.log(headers);
                 console.log(data);
                 console.log('通过code换取网页授权access_token');
                 let access_token = data.access_token;
@@ -86,16 +84,12 @@ server.get('/test', function (req, res) {
                 //检验授权凭证（access_token）是否有效
                 nodegrass.get(`https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid,
                     function (data, status, headers) {
-                        console.log(status);
-                        console.log(headers);
                         console.log(data);
                         console.log('检验授权凭证（access_token）是否有效');
                         if (data.errcode !== 0) {
                             //刷新access_token
                             nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + refresh_token,
                                 function (data, status, headers) {
-                                    console.log(status);
-                                    console.log(headers);
                                     console.log(data);
                                     console.log('刷新access_token');
                                     access_token = data.access_token;
@@ -108,8 +102,6 @@ server.get('/test', function (req, res) {
                         //拉取用户信息(需scope为 snsapi_userinfo)
                         nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`,
                             function (data, status, headers) {
-                                console.log(status);
-                                console.log(headers);
                                 console.log(data);
                                 console.log('拉取用户信息');
                             }, null, 'utf8').on('error', function (e) {
