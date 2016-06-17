@@ -91,8 +91,10 @@ server.get('/', function (req, res) {
 
 server.get('/test', function (req, res) {
     // res.redirect('https://github.com/miss61008596');
+    console.log('openId:'+process.env.APP_OPENID);
     //获取用户信息
     nodeWeixinUser.profile(settings, app, process.env.APP_OPENID, function (error, data) {
+
         console.log(data);
         res.send('data:'+JSON.stringify(data));
     });
