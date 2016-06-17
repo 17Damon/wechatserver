@@ -80,7 +80,8 @@ server.get('/test', function (req, res) {
                 console.log(headers);
                 console.log(data);
                 console.log('通过code换取网页授权access_token');
-                let access_token_package = data;
+                let access_token = data.access_token;
+                let refresh_token = data.refresh_token;
                 //检验授权凭证（access_token）是否有效
                 nodegrass.get(`https://api.weixin.qq.com/sns/auth?access_token=` + access_token_package.access_token + `&openid=` + access_token_package.openid,
                     function (data, status, headers) {
@@ -90,21 +91,21 @@ server.get('/test', function (req, res) {
                         console.log('检验授权凭证（access_token）是否有效');
                         if (data.errcode !== 0) {
                             //刷新access_token
-                            nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=`+access_token_package.refresh_token,
+                            nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + access_token_package.refresh_token,
                                 function (data, status, headers) {
                                     console.log(status);
                                     console.log(headers);
                                     console.log(data);
                                     console.log('刷新access_token');
-                                    access_token_package.access_token=data.access_token;
-                                    access_token_package.refresh_token=data.refresh_token;
+                                    access_token = data.access_token;
+                                    refresh_token = data.refresh_token;
                                 }, null, 'utf8').on('error', function (e) {
                                 //通过code换取网页授权access_token失败TODO
                                 console.log("Got error: " + e.message);
                             });
                         }
                         //拉取用户信息(需scope为 snsapi_userinfo)
-                        nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token_package.access_token + `&openid=` + access_token_package.openid + `&lang=zh_CN`,
+                        nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + access_token_package.openid + `&lang=zh_CN`,
                             function (data, status, headers) {
                                 console.log(status);
                                 console.log(headers);
