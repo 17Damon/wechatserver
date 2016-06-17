@@ -82,8 +82,9 @@ server.get('/test', function (req, res) {
                 console.log('通过code换取网页授权access_token');
                 let access_token = data.access_token;
                 let refresh_token = data.refresh_token;
+                let openid = data.openid;
                 //检验授权凭证（access_token）是否有效
-                nodegrass.get(`https://api.weixin.qq.com/sns/auth?access_token=` + access_token_package.access_token + `&openid=` + access_token_package.openid,
+                nodegrass.get(`https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid,
                     function (data, status, headers) {
                         console.log(status);
                         console.log(headers);
