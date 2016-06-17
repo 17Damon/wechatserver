@@ -70,63 +70,95 @@ server.get('/test', function (req, res, next) {
     var code = req.query.code;
     var state = req.query.state;
     var effect_flag = false;
+    var access_token;
+    var refresh_token;
+    var openid;
     console.log('times:' + times);
     console.log('code:' + code);
     console.log('state:' + state);
     if (code === undefined) {
         throw 'code不存在，请使用微信客户端登陆！';
     }
-    //通过code换取网页授权access_token
-    nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`,
-        function (data, status, headers) {
-            console.log('通过code换取网页授权access_token');
-            console.log(data);
-            var access_token = data.access_token;
-            var refresh_token = data.refresh_token;
-            var openid = data.openid;
-            Promise.resolve().then(function () {
-                //检验授权凭证（access_token）是否有效
-                nodegrass.get(`https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid,
-                    function (data, status, headers) {
-                        console.log('检验授权凭证（access_token）是否有效');
-                        console.log(data);
-                        if (data.errcode === 0) {
-                            effect_flag = true;
-                        }
-                    }, null, 'utf8').on('error', function (e) {
-                    //检验授权凭证（access_token）是否有效
-                    throw e;
-                })
-            }).then(function () {
-                if (!effect_flag) {
-                    //刷新access_token
-                    nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + refresh_token,
-                        function (data, status, headers) {
-                            console.log('刷新access_token');
-                            console.log(data);
-                            access_token = data.access_token;
-                            refresh_token = data.refresh_token;
-                        }, null, 'utf8').on('error', function (e) {
-                        //刷新access_token
-                        throw e;
-                    })
-                }
-            }).then(function () {
-                //拉取用户信息(需scope为 snsapi_userinfo)
-                nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`,
-                    function (data, status, headers) {
-                        console.log(data);
-                        console.log('拉取用户信息');
-                    }, null, 'utf8').on('error', function (e) {
-                    //拉取用户信息(需scope为 snsapi_userinfo)
-                    throw e;
-                })
-            }).catch(next);
-        }, null, 'utf8').on('error', function (e) {
-            //通过code换取网页授权access_token失败TODO
+
+    //通过code换取网页授权
+    var getAccessToken = function (id, secret, code) {
+        let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + id + `&secret=` + secret + `&code=` + code + `&grant_type=authorization_code`;
+        // let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`;
+        return new Promise(function (resolve, reject) {
+            nodegrass.get(url,
+                function (data, status, headers) {
+                    console.log('1.通过code换取网页授权access_token');
+                    if (error) return reject(error);
+                    console.log(data);
+                    access_token = data.access_token;
+                    refresh_token = data.refresh_token;
+                    openid = data.openid;
+                    resolve();
+                }, null, 'utf8');
+        });
+    };
+
+    //检验授权凭证（access_token）是否有效
+    var checkAccessToken = function (access_token, openid) {
+        let url = `https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid;
+        return new Promise(function (resolve, reject) {
+            nodegrass.get(url,
+                function (data, status, headers) {
+                    console.log('2.检验授权凭证（access_token）是否有效');
+                    if (error) return reject(error);
+                    console.log(data);
+                    if (data.errcode === 0) {
+                        effect_flag = true;
+                    }
+                    resolve();
+                }, null, 'utf8');
+        });
+    };
+
+    //刷新access_token
+    var refreshAccessToken = function (refresh_token, id) {
+        let url = `https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + id + `&grant_type=refresh_token&refresh_token=` + refresh_token;
+        return new Promise(function (resolve, reject) {
+            nodegrass.get(url,
+                function (data, status, headers) {
+                    console.log('3.刷新access_token');
+                    if (error) return reject(error);
+                    console.log(data);
+                    access_token = data.access_token;
+                    refresh_token = data.refresh_token;
+                    resolve();
+                }, null, 'utf8');
+        });
+    };
+
+    //拉取用户信息(需scope为 snsapi_userinfo)
+    var getUserinfo = function (access_token, openid) {
+        let url = `https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`;
+        return new Promise(function (resolve, reject) {
+            nodegrass.get(url,
+                function (data, status, headers) {
+                    console.log('4.拉取用户信息');
+                    if (error) return reject(error);
+                    console.log(data);
+                    resolve();
+                }, null, 'utf8');
+        });
+    };
+
+
+    function * getUser() {
+        try {
+            yield getAccessToken(app.id, app.secret, code);
+            yield checkAccessToken(access_token, openid);
+            if (!effect_flag) {
+                yield refreshAccessToken(refresh_token, app.id);
+            }
+            yield getUserinfo(access_token, openid);
+        } catch (e) {
             throw e;
         }
-    )
+    }
+    getUser();
 });
 
 //处理错误
