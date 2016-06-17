@@ -1,5 +1,6 @@
 'use strict';
 
+var nodeWeixinUser = require('node-weixin-user');
 var nodeWeixinAuth = require('node-weixin-auth');
 var settings = require('node-weixin-settings');
 
@@ -18,11 +19,16 @@ var app = {
 // nodeWeixinAuth.determine(settings, app, function () {
 //     //这里添加发送请求的代码
 // });
-//
+
 // //获取服务器IP
 // nodeWeixinAuth.ips(settings, app, function (error, data) {
 //     //error == false
 //     //data.ip_list获取IP列表
+// });
+//
+// //获取用户信息
+// nodeWeixinUser.profile(settings, app, process.env.APP_OPENID, function (error, data) {
+//     console.log(data);
 // });
 
 
@@ -80,6 +86,16 @@ server.get('/', function (req, res) {
 </body>
 </html>`);
 });
+
+server.get('/test', function (req, res) {
+    // res.redirect('https://github.com/miss61008596');
+    //获取用户信息
+    nodeWeixinUser.profile(settings, app, process.env.APP_OPENID, function (error, data) {
+        console.log(data);
+    });
+});
+
+
 
 var  listener = server.listen(80, function () {
     let host = listener.address().address;
