@@ -149,6 +149,13 @@ server.get('/test', function (req, res, next) {
         });
     };
 
+    function scheduler(task) {
+        setTimeout(function () {
+            if (!task.next().done){
+                scheduler(task);
+            }
+        },0);
+    }
 
     function * getUser() {
         try {
@@ -163,13 +170,7 @@ server.get('/test', function (req, res, next) {
         }
     }
     Promise.resolve().then(function () {
-        getUser().next();
-        getUser().next();
-        if (!effect_flag) {
-            getUser().next();
-        }
-        getUser().next();
-
+        scheduler(getUser());
     }).catch(next);
 
 
