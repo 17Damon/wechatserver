@@ -68,6 +68,9 @@ server.get('/', function (req, res) {
             res.send(`<html>
 <body>
 <div style="display: flex;flex-direction: row;justify-content: center;align-items: center">
+<div style="display: flex">
+<img style="width: 160px;height: 160px;border-radius: 80px;margin-right: 20px" src="http://120.27.124.108:10255/222.jpg" />
+</div>
 <div style="display: flex;flex-direction: column;">
 <h1>个人技术分享</h1>
 <h1>请访问我的github主页</h1><a href="https://github.com/miss61008596">https://github.com/miss61008596</a>
