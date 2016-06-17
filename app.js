@@ -20,7 +20,7 @@ server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
 
 // 微信服务器返回的ack信息是HTTP的GET方法实现的
-server.get('/ack', function (req, res) {
+server.get('/ack', function (req, res, next) {
     var data = nodeWeixinAuth.extract(req.query);
     nodeWeixinAuth.ack(app.token, data, function (error, data) {
         if (!error) {
@@ -45,7 +45,7 @@ server.get('/ack', function (req, res) {
     });
 });
 
-server.get('/', function (req, res) {
+server.get('/', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
     res.send(`<html>
 <body>
@@ -63,68 +63,81 @@ server.get('/', function (req, res) {
 </html>`);
 });
 
-server.get('/test', function (req, res) {
+server.get('/test', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
     var times = 1;
     //得到CODE
     var code = req.query.code;
     var state = req.query.state;
+    var effect_flag = false;
     console.log('times:' + times);
     console.log('code:' + code);
     console.log('state:' + state);
-    if (code) {
-        //通过code换取网页授权access_token
-        nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`,
-            function (data, status, headers) {
-                console.log(data);
-                console.log('通过code换取网页授权access_token');
-                let access_token = data.access_token;
-                let refresh_token = data.refresh_token;
-                let openid = data.openid;
+    if (code === undefined) {
+        throw 'code不存在，请使用微信客户端登陆！';
+    }
+    //通过code换取网页授权access_token
+    nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`,
+        function (data, status, headers) {
+            console.log('通过code换取网页授权access_token');
+            console.log(data);
+            var access_token = data.access_token;
+            var refresh_token = data.refresh_token;
+            var openid = data.openid;
+            Promise.resolve().then(function () {
                 //检验授权凭证（access_token）是否有效
                 nodegrass.get(`https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid,
                     function (data, status, headers) {
-                        console.log(data);
                         console.log('检验授权凭证（access_token）是否有效');
-                        if (data.errcode !== 0) {
-                            //刷新access_token
-                            nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + refresh_token,
-                                function (data, status, headers) {
-                                    console.log(data);
-                                    console.log('刷新access_token');
-                                    access_token = data.access_token;
-                                    refresh_token = data.refresh_token;
-                                }, null, 'utf8').on('error', function (e) {
-                                //通过code换取网页授权access_token失败TODO
-                                console.log("Got error: " + e.message);
-                            });
+                        console.log(data);
+                        if (data.errcode === 0) {
+                            effect_flag = true;
                         }
-                        //拉取用户信息(需scope为 snsapi_userinfo)
-                        nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`,
-                            function (data, status, headers) {
-                                console.log(data);
-                                console.log('拉取用户信息');
-                            }, null, 'utf8').on('error', function (e) {
-                            //通过code换取网页授权access_token失败TODO
-                            console.log("Got error: " + e.message);
-                        });
                     }, null, 'utf8').on('error', function (e) {
-                    //通过code换取网页授权access_token失败TODO
-                    console.log("Got error: " + e.message);
-                });
-
-            }, null, 'utf8').on('error', function (e) {
+                    //检验授权凭证（access_token）是否有效
+                    throw e;
+                })
+            }).then(function () {
+                if (!effect_flag) {
+                    //刷新access_token
+                    nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + refresh_token,
+                        function (data, status, headers) {
+                            console.log('刷新access_token');
+                            console.log(data);
+                            access_token = data.access_token;
+                            refresh_token = data.refresh_token;
+                        }, null, 'utf8').on('error', function (e) {
+                        //刷新access_token
+                        throw e;
+                    })
+                }
+            }).then(function () {
+                //拉取用户信息(需scope为 snsapi_userinfo)
+                nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`,
+                    function (data, status, headers) {
+                        console.log(data);
+                        console.log('拉取用户信息');
+                    }, null, 'utf8').on('error', function (e) {
+                    //拉取用户信息(需scope为 snsapi_userinfo)
+                    throw e;
+                })
+            }).catch(next);
+        }, null, 'utf8').on('error', function (e) {
             //通过code换取网页授权access_token失败TODO
-            console.log("Got error: " + e.message);
-        });
-    } else {
-        //code不存在TODO
-        console.log('res:no code ' + code);
-    }
-    times++;
-
+            throw e;
+        }
+    )
 });
 
+//处理错误
+server.use((err, req, res, next) => {
+    let data = {};
+    data.url = req.originalUrl;
+    data.error = err.stack ? err.stack : JSON.stringify(err);
+    res.status(500).json(
+        data
+    );
+});
 
 var listener = server.listen(80, function () {
     let host = listener.address().address;
