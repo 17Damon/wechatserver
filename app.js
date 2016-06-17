@@ -88,13 +88,14 @@ server.get('/test', function (req, res, next) {
             nodegrass.get(url,
                 function (data, status, headers) {
                     console.log('1.通过code换取网页授权access_token');
-                    if (error) return reject(error);
                     console.log(data);
                     access_token = data.access_token;
                     refresh_token = data.refresh_token;
                     openid = data.openid;
                     resolve();
-                }, null, 'utf8');
+                }, null, 'utf8').on('error', function (e) {
+                throw e;
+            });
         });
     };
 
@@ -105,13 +106,14 @@ server.get('/test', function (req, res, next) {
             nodegrass.get(url,
                 function (data, status, headers) {
                     console.log('2.检验授权凭证（access_token）是否有效');
-                    if (error) return reject(error);
                     console.log(data);
                     if (data.errcode === 0) {
                         effect_flag = true;
                     }
                     resolve();
-                }, null, 'utf8');
+                }, null, 'utf8').on('error', function (e) {
+                throw e;
+            });
         });
     };
 
@@ -122,12 +124,13 @@ server.get('/test', function (req, res, next) {
             nodegrass.get(url,
                 function (data, status, headers) {
                     console.log('3.刷新access_token');
-                    if (error) return reject(error);
                     console.log(data);
                     access_token = data.access_token;
                     refresh_token = data.refresh_token;
                     resolve();
-                }, null, 'utf8');
+                }, null, 'utf8').on('error', function (e) {
+                throw e;
+            });
         });
     };
 
@@ -138,10 +141,11 @@ server.get('/test', function (req, res, next) {
             nodegrass.get(url,
                 function (data, status, headers) {
                     console.log('4.拉取用户信息');
-                    if (error) return reject(error);
                     console.log(data);
                     resolve();
-                }, null, 'utf8');
+                }, null, 'utf8').on('error', function (e) {
+                throw e;
+            });
         });
     };
 
@@ -158,13 +162,18 @@ server.get('/test', function (req, res, next) {
             throw e;
         }
     }
-    getUser();
+    Promise.resolve().then(function () {
+        getUser().next();
+    }).catch(next);
+
+
+
 });
 
 //处理错误
 server.use((err, req, res, next) => {
     let data = {};
-    data.url = req.originalUrl;
+    // data.url = req.originalUrl;
     data.error = err.stack ? err.stack : JSON.stringify(err);
     res.status(500).json(
         data
