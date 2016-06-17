@@ -6,8 +6,9 @@ var app = {
     secret: '05dfc2c82ccd8a6ef5f3713762632402',
     token: 'zhubg'
 };
-
-var nodegrass = require('nodegrass');
+var request = require('request');
+var async = require("async");
+var rp = require('request-promise');
 
 //与微信对接服务器的验证
 var errors = require('web-errors').errors;
@@ -85,16 +86,14 @@ server.get('/test', function (req, res, next) {
         let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + id + `&secret=` + secret + `&code=` + code + `&grant_type=authorization_code`;
         // let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`;
         return new Promise(function (resolve, reject) {
-            nodegrass.get(url,
-                function (data, status, headers) {
-                    console.log('1.通过code换取网页授权access_token');
-                    console.log(data);
-                    access_token = data.access_token;
-                    refresh_token = data.refresh_token;
-                    openid = data.openid;
-                    resolve();
-                }, null, 'utf8').on('error', function (e) {
-                throw e;
+            request({url: url, json: true}, function (error, response, body) {
+                if (error) return reject(error);
+                console.log('1.通过code换取网页授权access_token');
+                console.log(body);
+                access_token = body.access_token;
+                refresh_token = body.refresh_token;
+                openid = body.openid;
+                resolve();
             });
         });
     };
@@ -103,16 +102,14 @@ server.get('/test', function (req, res, next) {
     var checkAccessToken = function (access_token, openid) {
         let url = `https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid;
         return new Promise(function (resolve, reject) {
-            nodegrass.get(url,
-                function (data, status, headers) {
-                    console.log('2.检验授权凭证（access_token）是否有效');
-                    console.log(data);
-                    if (data.errcode === 0) {
-                        effect_flag = true;
-                    }
-                    resolve();
-                }, null, 'utf8').on('error', function (e) {
-                throw e;
+            request({url: url, json: true}, function (error, response, body) {
+                if (error) return reject(error);
+                console.log('2.检验授权凭证（access_token）是否有效');
+                console.log(body);
+                if (body.errcode === 0) {
+                    effect_flag = true;
+                }
+                resolve();
             });
         });
     };
@@ -121,15 +118,13 @@ server.get('/test', function (req, res, next) {
     var refreshAccessToken = function (refresh_token, id) {
         let url = `https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + id + `&grant_type=refresh_token&refresh_token=` + refresh_token;
         return new Promise(function (resolve, reject) {
-            nodegrass.get(url,
-                function (data, status, headers) {
-                    console.log('3.刷新access_token');
-                    console.log(data);
-                    access_token = data.access_token;
-                    refresh_token = data.refresh_token;
-                    resolve();
-                }, null, 'utf8').on('error', function (e) {
-                throw e;
+            request({url: url, json: true}, function (error, response, body) {
+                if (error) return reject(error);
+                console.log('3.刷新access_token');
+                console.log(body);
+                access_token = body.access_token;
+                refresh_token = body.refresh_token;
+                resolve();
             });
         });
     };
@@ -138,44 +133,82 @@ server.get('/test', function (req, res, next) {
     var getUserinfo = function (access_token, openid) {
         let url = `https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`;
         return new Promise(function (resolve, reject) {
-            nodegrass.get(url,
-                function (data, status, headers) {
-                    console.log('4.拉取用户信息');
-                    console.log(data);
-                    resolve();
-                }, null, 'utf8').on('error', function (e) {
-                throw e;
+            request({url: url, json: true}, function (error, response, body) {
+                if (error) return reject(error);
+                console.log('4.拉取用户信息');
+                console.log(body);
+                resolve();
             });
         });
     };
 
-    function scheduler(task) {
-        setTimeout(function () {
-            if (!task.next().done){
-                scheduler(task);
-            }
-        },0);
-    }
 
-    function * getUser() {
-        try {
-            yield getAccessToken(app.id, app.secret, code);
-            yield checkAccessToken(access_token, openid);
-            if (!effect_flag) {
-                yield refreshAccessToken(refresh_token, app.id);
-            }
-            yield getUserinfo(access_token, openid);
-        } catch (e) {
-            throw e;
-        }
-    }
-    Promise.resolve().then(function () {
-        scheduler(getUser());
-    }).catch(next);
+    var options1 = {
+        uri: `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`,
+        simple: false    //  <---  <---  <---  <---
+    };
+    var options2 = {
+        uri: `https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid,
+        simple: false    //  <---  <---  <---  <---
+    };
+    var options3 = {
+        uri: `https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + refresh_token,
+        simple: false    //  <---  <---  <---  <---
+    };
+    var options4 = {
+        uri: `https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid,
+        simple: false    //  <---  <---  <---  <---
+    };
+    rp(options1)
+        .then(function (body) {
+            console.log('1');
+            console.log(body);
+            access_token = body.access_token;
+            refresh_token = body.refresh_token;
+            openid = body.openid;
+        }).then(function () {
+            rp(options2)
+                .then(function (body) {
+                    console.log('2');
+                    console.log(body);
+                    if (body.errcode === 0) {
+                        effect_flag = true;
+                    }
+                }).then(function () {
+                    if (!effect_flag) {
+                        rp(options3)
+                            .then(function (body) {
+                                console.log('3');
+                                console.log(body);
+                                access_token = body.access_token;
+                                refresh_token = body.refresh_token;
+                            }).then(function () {
+                                rp(options4)
+                                    .then(function (body) {
+                                        console.log('4');
+                                        console.log(body);
+                                    })
+                                    .catch(function (err) {
+                                        // Request failed due to technical reasons...
+                                        throw err;
+                                    });
 
-
-
+                            }
+                            )
+                            .catch(function (err) {
+                                // Request failed due to technical reasons...
+                                throw err;
+                            });
+                    }
+                })
+                .catch(function (err) {
+                    // Request failed due to technical reasons...
+                    throw err;
+                });
+        })
+        .catch(next);
 });
+
 
 //处理错误
 server.use((err, req, res, next) => {
