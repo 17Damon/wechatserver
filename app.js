@@ -65,36 +65,67 @@ server.get('/', function (req, res) {
 
 server.get('/test', function (req, res) {
     // res.redirect('https://github.com/miss61008596');
-    var times =1;
+    var times = 1;
     //得到CODE
     var code = req.query.code;
     var state = req.query.state;
-    console.log('times:'+times);
-    console.log('code:'+code);
-    console.log('state:'+state);
-    if (code){
-        nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=`+app.id+`&secret=`+app.secret+`&code=`+code+`&grant_type=authorization_code`,
+    console.log('times:' + times);
+    console.log('code:' + code);
+    console.log('state:' + state);
+    if (code) {
+        //通过code换取网页授权access_token
+        nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`,
             function (data, status, headers) {
                 console.log(status);
                 console.log(headers);
                 console.log(data);
-                nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=`+data.access_token+`&openid=`+data.openid+`&lang=zh_CN`,
+                console.log('通过code换取网页授权access_token');
+                let access_token_package = data;
+                //检验授权凭证（access_token）是否有效
+                nodegrass.get(`https://api.weixin.qq.com/sns/auth?access_token=` + access_token_package.access_token + `&openid=` + access_token_package.openid,
                     function (data, status, headers) {
                         console.log(status);
                         console.log(headers);
                         console.log(data);
-
+                        console.log('检验授权凭证（access_token）是否有效');
+                        if (data.errcode !== 0) {
+                            //刷新access_token
+                            nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=`+access_token_package.refresh_token,
+                                function (data, status, headers) {
+                                    console.log(status);
+                                    console.log(headers);
+                                    console.log(data);
+                                    console.log('刷新access_token');
+                                    access_token_package.access_token=data.access_token;
+                                    access_token_package.refresh_token=data.refresh_token;
+                                }, null, 'utf8').on('error', function (e) {
+                                //通过code换取网页授权access_token失败TODO
+                                console.log("Got error: " + e.message);
+                            });
+                        }
+                        //拉取用户信息(需scope为 snsapi_userinfo)
+                        nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token_package.access_token + `&openid=` + access_token_package.openid + `&lang=zh_CN`,
+                            function (data, status, headers) {
+                                console.log(status);
+                                console.log(headers);
+                                console.log(data);
+                                console.log('拉取用户信息');
+                            }, null, 'utf8').on('error', function (e) {
+                            //通过code换取网页授权access_token失败TODO
+                            console.log("Got error: " + e.message);
+                        });
                     }, null, 'utf8').on('error', function (e) {
                     //通过code换取网页授权access_token失败TODO
                     console.log("Got error: " + e.message);
                 });
+
             }, null, 'utf8').on('error', function (e) {
             //通过code换取网页授权access_token失败TODO
             console.log("Got error: " + e.message);
         });
     } else {
         //code不存在TODO
-       console.log('res:no code '+code);
+        console.log('res:no code ' + code);
     }
     times++;
 
