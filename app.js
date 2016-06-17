@@ -4,8 +4,8 @@ var nodeWeixinAuth = require('node-weixin-auth');
 var settings = require('node-weixin-settings');
 
 var app = {
-    id: 'wxd73dc548a07ac76c',
-    secret: '11507723ee56e2b3f706abc505c62b2b',
+    id: 'wx7ca9c509abe55d26',
+    secret: '05dfc2c82ccd8a6ef5f3713762632402',
     token: 'zhubg'
 };
 
