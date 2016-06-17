@@ -65,8 +65,10 @@ server.get('/', function (req, res) {
 
 server.get('/test', function (req, res) {
     // res.redirect('https://github.com/miss61008596');
-    var code = req.body.code;
-    console.log(code);
+    var code = req.query.code;
+    var state = req.query.state;
+    console.log('code:'+code);
+    console.log('state:'+state);
     if (code){
         res.send('res:It\'s code '+code);
     } else {
