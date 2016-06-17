@@ -65,7 +65,7 @@ server.get('/', function (req, res) {
 
 server.get('/test', function (req, res) {
     // res.redirect('https://github.com/miss61008596');
-    var times =0;
+    var times =1;
     var code = req.query.code;
     var state = req.query.state;
     console.log('times:'+times);
@@ -78,9 +78,11 @@ server.get('/test', function (req, res) {
                 console.log(headers);
                 console.log(data);
             }, null, 'utf8').on('error', function (e) {
+            //通过code换取网页授权access_token失败TODO
             console.log("Got error: " + e.message);
         });
     } else {
+        //code不存在TODO
        console.log('res:no code '+code);
     }
     times++;
