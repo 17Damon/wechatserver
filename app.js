@@ -92,7 +92,7 @@ server.get('/test', function (req, res) {
                         console.log('检验授权凭证（access_token）是否有效');
                         if (data.errcode !== 0) {
                             //刷新access_token
-                            nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + access_token_package.refresh_token,
+                            nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + app.id + `&grant_type=refresh_token&refresh_token=` + refresh_token,
                                 function (data, status, headers) {
                                     console.log(status);
                                     console.log(headers);
@@ -106,7 +106,7 @@ server.get('/test', function (req, res) {
                             });
                         }
                         //拉取用户信息(需scope为 snsapi_userinfo)
-                        nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + access_token_package.openid + `&lang=zh_CN`,
+                        nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`,
                             function (data, status, headers) {
                                 console.log(status);
                                 console.log(headers);
