@@ -1,42 +1,16 @@
 'use strict';
 
-var nodeWeixinUser = require('node-weixin-user');
 var nodeWeixinAuth = require('node-weixin-auth');
-var settings = require('node-weixin-settings');
-
 var app = {
     id: 'wx7ca9c509abe55d26',
     secret: '05dfc2c82ccd8a6ef5f3713762632402',
     token: 'zhubg'
 };
-var config = require("node-weixin-config");
-config.app.init(app);
 
-// //手动得到accessToken
-// nodeWeixinAuth.tokenize(settings, app, function (error, json) {
-//     var accessToken = json.access_token;
-// });
-//
-// //自动获得accessToken，并发送需要accessToken的请求
-// nodeWeixinAuth.determine(settings, app, function () {
-//     //这里添加发送请求的代码
-// });
-
-// //获取服务器IP
-// nodeWeixinAuth.ips(settings, app, function (error, data) {
-//     //error == false
-//     //data.ip_list获取IP列表
-// });
-//
-// //获取用户信息
-// nodeWeixinUser.profile(settings, app, process.env.APP_OPENID, function (error, data) {
-//     console.log(data);
-// });
-
+var nodegrass = require('nodegrass');
 
 //与微信对接服务器的验证
 var errors = require('web-errors').errors;
-// var request = require('supertest');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -51,7 +25,7 @@ server.get('/ack', function (req, res) {
     nodeWeixinAuth.ack(app.token, data, function (error, data) {
         if (!error) {
             res.send(data);
-            console.log('connetct done!:'+data);
+            console.log('connetct done!:' + data);
             return;
         }
         switch (error) {
@@ -72,8 +46,8 @@ server.get('/ack', function (req, res) {
 });
 
 server.get('/', function (req, res) {
-            // res.redirect('https://github.com/miss61008596');
-            res.send(`<html>
+    // res.redirect('https://github.com/miss61008596');
+    res.send(`<html>
 <body>
 <div style="display: flex;flex-direction: row;justify-content: center;align-items: center">
 <div style="display: flex">
@@ -91,18 +65,26 @@ server.get('/', function (req, res) {
 
 server.get('/test', function (req, res) {
     // res.redirect('https://github.com/miss61008596');
-    console.log('openId:'+process.env.APP_OPENID);
-    //获取用户信息
-    nodeWeixinUser.profile(settings, app, process.env.APP_OPENID, function (error, data) {
+    var code = req.body.code;
+    console.log(code);
+    if (code){
+        res.send('res:It\'s code '+code);
+    } else {
+        res.send('res:no code '+code);
+    }
+    // nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=`+app.id+`&secret=`+app.secret+`&code=`+code+`&grant_type=authorization_code`,
+    //     function (data, status, headers) {
+    //         console.log(status);
+    //         console.log(headers);
+    //         console.log(data);
+    //     }, null, 'utf8').on('error', function (e) {
+    //     console.log("Got error: " + e.message);
+    // });
 
-        console.log(data);
-        res.send('data:'+JSON.stringify(data));
-    });
 });
 
 
-
-var  listener = server.listen(80, function () {
+var listener = server.listen(80, function () {
     let host = listener.address().address;
     let port = listener.address().port;
     console.log('hello,http://' + host + ':' + port);
