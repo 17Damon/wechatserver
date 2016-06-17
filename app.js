@@ -164,6 +164,12 @@ server.get('/test', function (req, res, next) {
     }
     Promise.resolve().then(function () {
         getUser().next();
+        getUser().next();
+        if (!effect_flag) {
+            getUser().next();
+        }
+        getUser().next();
+
     }).catch(next);
 
 
