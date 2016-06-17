@@ -65,23 +65,25 @@ server.get('/', function (req, res) {
 
 server.get('/test', function (req, res) {
     // res.redirect('https://github.com/miss61008596');
+    var times =0;
     var code = req.query.code;
     var state = req.query.state;
+    console.log('times:'+times);
     console.log('code:'+code);
     console.log('state:'+state);
     if (code){
-        res.send('res:It\'s code '+code);
+        nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=`+app.id+`&secret=`+app.secret+`&code=`+code+`&grant_type=authorization_code`,
+            function (data, status, headers) {
+                console.log(status);
+                console.log(headers);
+                console.log(data);
+            }, null, 'utf8').on('error', function (e) {
+            console.log("Got error: " + e.message);
+        });
     } else {
-        res.send('res:no code '+code);
+       console.log('res:no code '+code);
     }
-    // nodegrass.get(`https://api.weixin.qq.com/sns/oauth2/access_token?appid=`+app.id+`&secret=`+app.secret+`&code=`+code+`&grant_type=authorization_code`,
-    //     function (data, status, headers) {
-    //         console.log(status);
-    //         console.log(headers);
-    //         console.log(data);
-    //     }, null, 'utf8').on('error', function (e) {
-    //     console.log("Got error: " + e.message);
-    // });
+    times++;
 
 });
 
