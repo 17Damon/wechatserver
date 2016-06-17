@@ -11,6 +11,7 @@
     "jade": "~1.11.0",
     "morgan": "~1.6.1",
     "node-weixin-auth": "^0.6.1",
+    "node-weixin-config": "^0.3.0",
     "node-weixin-settings": "^0.2.1",
     "node-weixin-user": "^0.6.0",
     "serve-favicon": "~2.3.0",

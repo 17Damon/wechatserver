@@ -9,6 +9,8 @@ var app = {
     secret: '05dfc2c82ccd8a6ef5f3713762632402',
     token: 'zhubg'
 };
+var config = require("node-weixin-config");
+config.app.init(app);
 
 // //手动得到accessToken
 // nodeWeixinAuth.tokenize(settings, app, function (error, json) {
