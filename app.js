@@ -66,6 +66,7 @@ server.get('/', function (req, res) {
 server.get('/test', function (req, res) {
     // res.redirect('https://github.com/miss61008596');
     var times =1;
+    //得到CODE
     var code = req.query.code;
     var state = req.query.state;
     console.log('times:'+times);
@@ -77,6 +78,16 @@ server.get('/test', function (req, res) {
                 console.log(status);
                 console.log(headers);
                 console.log(data);
+                nodegrass.get(`https://api.weixin.qq.com/sns/userinfo?access_token=`+data.access_token+`&openid=`+data.openid+`&lang=zh_CN`,
+                    function (data, status, headers) {
+                        console.log(status);
+                        console.log(headers);
+                        console.log(data);
+
+                    }, null, 'utf8').on('error', function (e) {
+                    //通过code换取网页授权access_token失败TODO
+                    console.log("Got error: " + e.message);
+                });
             }, null, 'utf8').on('error', function (e) {
             //通过code换取网页授权access_token失败TODO
             console.log("Got error: " + e.message);
