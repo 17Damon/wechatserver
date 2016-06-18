@@ -4,6 +4,7 @@
 
 'use strict';
 
+var nodegrass = require('nodegrass');
 var access_token;
 var refresh_token;
 var openid;
@@ -36,11 +37,11 @@ function checkAccessToken(access_token, openid) {
         console.log(status);
         console.log(headers);
         console.log(data);
-        if (body.errcode === 0) {
+        if (data.errcode === 0) {
             effect_flag = true;
             return getUserinfo(access_token, openid)
         }else {
-            return refreshAccessToken(refresh_token, app.id)
+            return refreshAccessToken(refresh_token, id)
         }
     }, null, 'utf8').on('error', function (e) {
         console.log("Got error: " + e.message);

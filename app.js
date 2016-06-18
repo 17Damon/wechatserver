@@ -7,9 +7,6 @@ var app = {
     token: 'zhubg'
 };
 
-var request = require('request');
-var async = require("async");
-var rp = require('request-promise');
 var getAccessToken = require('./until_api/get_user_info/get_user_info');
 
 //与微信对接服务器的验证
@@ -83,68 +80,69 @@ server.get('/test', function (req, res, next) {
         throw 'code不存在，请使用微信客户端登陆！';
     }
 
-    //通过code换取网页授权
-    var getAccessToken = function (id, secret, code) {
-        let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + id + `&secret=` + secret + `&code=` + code + `&grant_type=authorization_code`;
-        // let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`;
-        return new Promise(function (resolve, reject) {
-            request({url: url, json: true}, function (error, response, body) {
-                if (error) return reject(error);
-                console.log('1.通过code换取网页授权access_token');
-                console.log(body);
-                access_token = body.access_token;
-                refresh_token = body.refresh_token;
-                openid = body.openid;
-                resolve();
-            });
-        });
-    };
-
-    //检验授权凭证（access_token）是否有效
-    var checkAccessToken = function (access_token, openid) {
-        let url = `https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid;
-        return new Promise(function (resolve, reject) {
-            request({url: url, json: true}, function (error, response, body) {
-                if (error) return reject(error);
-                console.log('2.检验授权凭证（access_token）是否有效');
-                console.log(body);
-                if (body.errcode === 0) {
-                    effect_flag = true;
-                }
-                resolve();
-            });
-        });
-    };
-
-    //刷新access_token
-    var refreshAccessToken = function (refresh_token, id) {
-        let url = `https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + id + `&grant_type=refresh_token&refresh_token=` + refresh_token;
-        return new Promise(function (resolve, reject) {
-            request({url: url, json: true}, function (error, response, body) {
-                if (error) return reject(error);
-                console.log('3.刷新access_token');
-                console.log(body);
-                access_token = body.access_token;
-                refresh_token = body.refresh_token;
-                resolve();
-            });
-        });
-    };
-
-    //拉取用户信息(需scope为 snsapi_userinfo)
-    var getUserinfo = function (access_token, openid) {
-        let url = `https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`;
-        return new Promise(function (resolve, reject) {
-            request({url: url, json: true}, function (error, response, body) {
-                if (error) return reject(error);
-                console.log('4.拉取用户信息');
-                console.log(body);
-                resolve();
-            });
-        });
-    };
+    // //通过code换取网页授权
+    // var getAccessToken = function (id, secret, code) {
+    //     let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + id + `&secret=` + secret + `&code=` + code + `&grant_type=authorization_code`;
+    //     // let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + app.id + `&secret=` + app.secret + `&code=` + code + `&grant_type=authorization_code`;
+    //     return new Promise(function (resolve, reject) {
+    //         request({url: url, json: true}, function (error, response, body) {
+    //             if (error) return reject(error);
+    //             console.log('1.通过code换取网页授权access_token');
+    //             console.log(body);
+    //             access_token = body.access_token;
+    //             refresh_token = body.refresh_token;
+    //             openid = body.openid;
+    //             resolve();
+    //         });
+    //     });
+    // };
+    //
+    // //检验授权凭证（access_token）是否有效
+    // var checkAccessToken = function (access_token, openid) {
+    //     let url = `https://api.weixin.qq.com/sns/auth?access_token=` + access_token + `&openid=` + openid;
+    //     return new Promise(function (resolve, reject) {
+    //         request({url: url, json: true}, function (error, response, body) {
+    //             if (error) return reject(error);
+    //             console.log('2.检验授权凭证（access_token）是否有效');
+    //             console.log(body);
+    //             if (body.errcode === 0) {
+    //                 effect_flag = true;
+    //             }
+    //             resolve();
+    //         });
+    //     });
+    // };
+    //
+    // //刷新access_token
+    // var refreshAccessToken = function (refresh_token, id) {
+    //     let url = `https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=` + id + `&grant_type=refresh_token&refresh_token=` + refresh_token;
+    //     return new Promise(function (resolve, reject) {
+    //         request({url: url, json: true}, function (error, response, body) {
+    //             if (error) return reject(error);
+    //             console.log('3.刷新access_token');
+    //             console.log(body);
+    //             access_token = body.access_token;
+    //             refresh_token = body.refresh_token;
+    //             resolve();
+    //         });
+    //     });
+    // };
+    //
+    // //拉取用户信息(需scope为 snsapi_userinfo)
+    // var getUserinfo = function (access_token, openid) {
+    //     let url = `https://api.weixin.qq.com/sns/userinfo?access_token=` + access_token + `&openid=` + openid + `&lang=zh_CN`;
+    //     return new Promise(function (resolve, reject) {
+    //         request({url: url, json: true}, function (error, response, body) {
+    //             if (error) return reject(error);
+    //             console.log('4.拉取用户信息');
+    //             console.log(body);
+    //             resolve();
+    //         });
+    //     });
+    // };
 
     res.send(getAccessToken(app.id,app.secret,code));
+    next();
 });
 
 
