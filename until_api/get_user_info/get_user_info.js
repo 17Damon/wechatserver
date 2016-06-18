@@ -30,8 +30,8 @@ function getAccessToken(appid, secret, code,res) {
             return checkAccessToken(access_token, openid);
         } else {
             console.log('获取access_token失败');
-            // return resCustom('获取access_token失败');
-            return getAccessToken(appid,secret,code);
+            return resCustom('获取access_token失败');
+            // return getAccessToken(appid,secret,code);
         }
     }, null, 'utf8').on('error', function (e) {
         console.log("Got error: " + e.message);
@@ -72,7 +72,8 @@ function refreshAccessToken(refresh_token, id) {
         refresh_token = data.refresh_token;
         if(errcode){
             console.log('刷新失败，再次刷新！');
-            return refreshAccessToken(refresh_token, id);
+            return resCustom('刷新access_token失败');
+            // return refreshAccessToken(refresh_token, id);
         }else {
             return getUserinfo(access_token, openid);
         }
@@ -92,7 +93,8 @@ function getUserinfo(access_token, openid) {
         console.log(data);
         if (errcode){
             console.log('拉取用户信息，再次拉取用户信息！');
-            return getUserinfo(access_token, openid);
+            return resCustom('拉取用户信息失败');
+            // return getUserinfo(access_token, openid);
         }else {
             return resCustom(data);
         }
