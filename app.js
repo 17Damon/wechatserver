@@ -1,20 +1,14 @@
 'use strict';
 
 var nodeWeixinAuth = require('node-weixin-auth');
-var app = {
-    id: 'wx7ca9c509abe55d26',
-    secret: '05dfc2c82ccd8a6ef5f3713762632402',
-    token: 'zhubg'
-};
-
 var getAccessToken = require('./until_api/get_user_info/get_user_info');
-
+var baseController = require('./controller/base_controller');
 //与微信对接服务器的验证
 var errors = require('web-errors').errors;
 var express = require('express');
 var bodyParser = require('body-parser');
-
 var server = express();
+var params = {};
 
 server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
@@ -65,19 +59,30 @@ server.get('/', function (req, res, next) {
 
 server.all('/test', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
-    var times = 1;
     //得到CODE
     var code = req.query.code;
     var state = req.query.state;
-    console.log('times:' + times);
     console.log('code:' + code);
     console.log('state:' + state);
     if (code === undefined) {
         throw 'code不存在，请使用微信客户端登陆！';
     }
-    getAccessToken(app.id,app.secret,code,res);
-});
 
+
+        // baseController(req, res, 'user', 'checkSyncUserInfo',params);
+
+params.next = next;
+
+    baseController(req, res, 'user', 'checkSyncUserInfo',params);
+    // baseController(req, res, 'user', 'getUserByOpenid',params)
+    //     .then(obj => {
+    //         //成功响应
+    //         res.json(obj);
+    //         console.log(obj)
+    //     })
+    //     //失败退出
+    //     .catch(next);
+});
 
 //处理错误
 server.use((err, req, res, next) => {
@@ -91,6 +96,7 @@ server.use((err, req, res, next) => {
     );
 });
 
+//server启动80
 var listener = server.listen(80, function () {
     let host = listener.address().address;
     let port = listener.address().port;
