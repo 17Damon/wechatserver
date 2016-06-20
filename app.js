@@ -1,8 +1,8 @@
 'use strict';
 
 var nodeWeixinAuth = require('node-weixin-auth');
-var getAccessToken = require('./until_api/get_user_info/get_user_info');
 var baseController = require('./controller/base_controller');
+var path = require('path');
 //与微信对接服务器的验证
 var errors = require('web-errors').errors;
 var express = require('express');
@@ -10,8 +10,19 @@ var bodyParser = require('body-parser');
 var server = express();
 var params = {};
 
+// Make sure to include the JSX transpiler
+require('node-jsx').install();
+
+// Include static assets. Not advised for production
+server.use(express.static(path.join(__dirname, 'public')));
+// Set view path
+server.set('views', path.join(__dirname, 'views'));
+// set up ejs for templating. You can use whatever
+server.set('view engine', 'ejs');
+
 server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
+
 
 // 微信服务器返回的ack信息是HTTP的GET方法实现的
 server.get('/ack', function (req, res, next) {
@@ -57,6 +68,9 @@ server.get('/', function (req, res, next) {
 </html>`);
 });
 
+
+require('./app/routes/core-routes.js')(server);
+
 server.all('/test', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
     //得到CODE
@@ -68,12 +82,14 @@ server.all('/test', function (req, res, next) {
         throw 'code不存在，请使用微信客户端登陆！';
     }
 
+    res.render('index', {
+        react: ReactDOM.renderToString(HelloMessage({name: "John"}))
+    });
+    // baseController(req, res, 'user', 'checkSyncUserInfo',params);        
 
-        // baseController(req, res, 'user', 'checkSyncUserInfo',params);
-
-params.next = next;
-
-    baseController(req, res, 'user', 'checkSyncUserInfo',params);
+    // params.next = next;
+    //
+    // baseController(req, res, 'user', 'checkSyncUserInfo', params);
     // baseController(req, res, 'user', 'getUserByOpenid',params)
     //     .then(obj => {
     //         //成功响应

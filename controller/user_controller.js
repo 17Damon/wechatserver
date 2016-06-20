@@ -49,6 +49,16 @@ controller.insert = function (req,res,module,method) {
     return baseServirce(req,res,module,method);
 };
 
+//update
+controller.update = function (req,res,module,method) {
+    //some code
+
+    console.log('userController-insert');
+    //promise
+    return baseServirce(req,res,module,method);
+};
+
+
 //edit
 controller.edit = function (req,res,module,method) {
     //some code

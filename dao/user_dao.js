@@ -35,12 +35,12 @@ dao.getUserByOpenid = function (req, res, module, method, params) {
         var AQL = `
         For i in user
             FILTER i.openid == \'` + openid + `\' 
-            return i
+            return UNSET(i,@tokill)
         `;
         console.log('AQL:' + AQL);
 
         //promise
-        return db.query(AQL)
+        return db.query(AQL, tokill)
             .then((cursor)=> {
                 return cursor.all()
             });
@@ -69,6 +69,32 @@ dao.insert = function (req, res, module, method, params) {
             });
     } else {
         throw `params.user Undefined!Check it!`;
+    }
+};
+
+//update
+dao.update = function (req, res, module, method, params) {
+    //some code
+    console.log(JSON.stringify(params));
+    console.log('userDao-update');
+    if (params.user ) {
+        let openid = params.user.openid;
+        console.log('openid:' + openid);
+        var AQL = `
+        For i in user
+            FILTER i.openid == \'` + openid + `\' 
+            UPDATE i WITH `+JSON.stringify(params.user)+` IN user
+            return UNSET(i,@tokill)
+        `;
+        console.log('AQL:' + AQL);
+
+        //promise
+        return db.query(AQL, tokill)
+            .then((cursor)=> {
+                return cursor.all()
+            });
+    } else {
+        throw `params.openid Undefined!Check it!`;
     }
 };
 
@@ -124,7 +150,7 @@ dao.deleteUserByOpenid = function (req, res, module, method, params) {
 dao.queryAql = function (req, res, module, method, params) {
     //some code
 
-    console.log('userDao-queryAql')
+    console.log('userDao-queryAql');
     var aqlStr = '199';
     console.log('aqlStr:' + aqlStr);
     var AQL = `
@@ -139,7 +165,7 @@ dao.queryAql = function (req, res, module, method, params) {
         .then((cursor)=> {
             return cursor.all()
         });
-}
+};
 //功能Dao---end---
 
 //return

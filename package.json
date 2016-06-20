@@ -5,16 +5,30 @@
   "scripts": {},
   "dependencies": {
     "arangojs": "^5.0.1",
-    "async": "^2.0.0-rc.6",
     "body-parser": "~1.13.2",
     "cookie-parser": "~1.3.5",
     "debug": "~2.2.0",
+    "ejs": "^2.4.2",
     "express": "~4.13.1",
-    "jade": "~1.11.0",
+    "griddle-react": "^0.5.1",
     "morgan": "~1.6.1",
     "node-weixin-auth": "^0.6.1",
     "nodegrass": "0.0.3",
+    "path": "^0.12.7",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
     "serve-favicon": "~2.3.0",
-    "web-errors": "^0.1.5"
+    "underscore": "^1.8.3",
+    "web-errors": "^0.1.5",
+    "webpack": "^1.13.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.1",
+    "gulp": "^3.9.1",
+    "gulp-browserify": "^0.5.1",
+    "gulp-concat": "^2.6.0",
+    "node-jsx": "^0.13.3",
+    "react-tools": "^0.13.3",
+    "reactify": "^1.1.1"
   }
 }
