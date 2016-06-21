@@ -3,7 +3,7 @@
 var React = require('react');
 
 /* create factory with griddle component */
-var Griddle = React.createFactory(require('griddle-react'));
+// var Griddle = React.createFactory(require('griddle-react'));
 
 // var fakeData = require('../data/fakeData.js').fakeData;
 // var columnMeta = require('../data/columnMeta.js').columnMeta;
@@ -34,4 +34,4 @@ var ReactApp = React.createClass({
   });
 
 /* Module.exports instead of normal dom mounting */
-module.exports = ReactApp;
+module.exports = React.createFactory(ReactApp);
