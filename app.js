@@ -10,6 +10,14 @@ var bodyParser = require('body-parser');
 var server = express();
 var params = {};
 
+//开启gzip
+var compression = require('compression')
+
+// compress all requests
+server.use(compression());
+
+// add all routes
+
 // Make sure to include the JSX transpiler
 require('node-jsx').install();
 
