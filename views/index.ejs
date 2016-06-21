@@ -2,14 +2,15 @@
 <html>
   <head>
     <title>React Isomorphic Server Side Rendering Example</title>
-    <link href='/styles.css' rel="stylesheet">
+    <!--<link href='/styles.css' rel="stylesheet">-->
   </head>
   <body>
 	<h1 id="main-title">Isomorphic Server Side Rendering with React</h1>
-
-    <div id="react-main-mount">
-      <%- reactOutput %>
-    </div>
+      <div id="react-main-mount"><%-reactOutput%></div>
+    <script type="text/javascript">
+      // 传递服务端状态
+      var initProps = {num:<%-num%>};
+    </script>
 
 	<!-- comment out main.js to see server side only rendering -->
 	<script src="/main.js"></script>
