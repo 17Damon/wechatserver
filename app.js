@@ -11,16 +11,15 @@ var server = express();
 var params = {};
 
 //开启gzip
-var compression = require('compression')
+var compression = require('compression');
 
 // compress all requests
 server.use(compression());
 
 // add all routes
 
-// Make sure to include the JSX transpiler
-require('node-jsx').install();
-
+// Make sure to include the babel transpiler
+require("babel-register");
 // Include static assets. Not advised for production
 server.use(express.static(path.join(__dirname, 'public')));
 // Set view path
@@ -76,7 +75,7 @@ server.get('/', function (req, res, next) {
 </html>`);
 });
 
-
+//加载主路径
 require('./app/routes/core-routes.js')(server);
 
 server.all('/test', function (req, res, next) {

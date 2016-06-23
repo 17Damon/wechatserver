@@ -1,6 +1,7 @@
 var ReactDOMServer  = require('react-dom/server'),
     React = require('react'),
-    ReactApp = React.createFactory(require('../components/ReactApp'));
+    ReactApp = require('../components/ReactApp');
+
 
 module.exports = function (app) {
     var num = Math.random();
