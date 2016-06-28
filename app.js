@@ -93,6 +93,10 @@ require('./app/routes/support_routes')(server);
 
 server.all('/test88', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
+    //初始化params参数集为空
+    let params = {};
+    params.next = next;
+    params.redirecturl = '/test2';
     // 得到CODE
     var code = req.query.code;
     var state = req.query.state;
@@ -101,16 +105,20 @@ server.all('/test88', function (req, res, next) {
     if (code === undefined) {
         throw 'code不存在，请使用微信客户端登陆！';
     }
+    console.log('up: ' + req.session.code);
+    if (!req.session.code) {
+        console.log('first time!');
+        req.session.code = code;
+        baseController(req, res, 'user', 'checkSyncUserInfo', params);
+    }
+    console.log('down: ' + req.session.code);
+    console.log('many time!');
+    console.dir(req.session);
 
-    //初始化params参数集为空
-    let params = {};
-    params.next = next;
-    params.redirecturl = '/test2';
-    console.log(req.session.openid);
-    if(req.session.openid){
+    if (req.session.openid) {
         res.redirect(params.redirecturl);
-    }else {
-        baseController(req, res, 'user', 'checkSyncUserInfo',params);
+    } else {
+        res.send('wechat fuck');
     }
 });
 
@@ -123,7 +131,6 @@ server.all('/test99', function (req, res, next) {
     console.dir(req.session);
     res.send(openid);
 });
-
 
 
 //处理错误
