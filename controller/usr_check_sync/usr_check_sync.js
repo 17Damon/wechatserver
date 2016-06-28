@@ -30,6 +30,7 @@ function getAccessToken(req, res, module, method, params) {
             if (data_json.access_token && data_json.openid) {
                 access_token = data_json.access_token;
                 refresh_token = data_json.refresh_token;
+                req.session.access_token = access_token;
                 openid = data_json.openid;
                 return checkAccessToken(access_token, openid, req, res, params);
             } else {
