@@ -20,26 +20,29 @@ var underscore = require('underscore');
 //通过code换取网页授权
 function getAccessToken(req, res, module, method, params) {
     let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + appid + `&secret=` + appsecret + `&code=` + req.query.code + `&grant_type=authorization_code`;
-    nodegrass.get(url, function (data, status, headers) {
-        console.log('1.通过code换取网页授权access_token');
-        console.log(status);
-        console.log(headers);
-        console.log(data);
-        let data_json = JSON.parse(data);
-        if (data_json.access_token && data_json.openid) {
-            access_token = data_json.access_token;
-            refresh_token = data_json.refresh_token;
-            openid = data_json.openid;
-    return checkAccessToken(access_token, openid, req, res, params);
-        } else {
-            console.log('获取access_token失败');
-            params.next('微信服务器获取access_token失败异常，请重新打开链接！');
-        }
-    }, null, 'utf8').on('error', function (e) {
-        console.log("Got error: " + e.message);
-        params.next('微信服务器拉取用户信息异常，请重新打开链接！');
-
-    });
+    if (!req.session.access_token ){
+        nodegrass.get(url, function (data, status, headers) {
+            console.log('1.通过code换取网页授权access_token');
+            console.log(status);
+            console.log(headers);
+            console.log(data);
+            let data_json = JSON.parse(data);
+            if (data_json.access_token && data_json.openid) {
+                access_token = data_json.access_token;
+                refresh_token = data_json.refresh_token;
+                openid = data_json.openid;
+                return checkAccessToken(access_token, openid, req, res, params);
+            } else {
+                console.log('获取access_token失败');
+                params.next('微信服务器获取access_token失败异常，请重新打开链接！');
+            }
+        }, null, 'utf8').on('error', function (e) {
+            console.log("Got error: " + e.message);
+            params.next('微信服务器拉取用户信息异常，请重新打开链接！');
+        });
+    }else {
+        return checkAccessToken(req.session.access_token, req.session.openid, req, res, params);
+    }
 }
 
 //检验授权凭证（access_token）是否有效
@@ -56,7 +59,7 @@ function checkAccessToken(access_token, openid, req, res, params) {
             return getUserinfo(access_token, openid, req, res, params);
         } else {
             console.log('access_token超时');
-            return refreshAccessToken('vwRBLoAqhxjwZCsqYlwab1VMFcj9SKO-w7DGsFI5xaNgTvbWdxkr_7kcvOipgat6m8iojTYli9NolR4eFmi9TJBW6VksaE1Jys4Rmps5UQ8', req, res, params);
+            return refreshAccessToken(refresh_token, req, res, params);
         }
     }, null, 'utf8').on('error', function (e) {
         console.log("Got error: " + e.message);
@@ -78,11 +81,11 @@ function refreshAccessToken(refresh_token, req, res, params) {
         refresh_token = data_json.refresh_token;
         if (data_json.errcode) {
             console.log('刷新失败，再次刷新！');
-            // return resCustom('刷新access_token失败');
-            // return refreshAccessToken(refresh_token, id);
+            params.next('刷新access_token失败');
         } else {
             console.log('刷新access_token成功！');
             console.log(data_json);
+            req.session.access_token = access_token;
             return getUserinfo(access_token, openid, req, res, params);
         }
     }, null, 'utf8').on('error', function (e) {
@@ -121,7 +124,7 @@ function getUserinfo(access_token, openid, req, res, params) {
 
                                 //1.查询同步完成，API出口
                                 req.session.openid = params.openid;
-                                res.redirect(params.redirecturl);
+                                
 
                             })
                             //失败退出
@@ -136,7 +139,7 @@ function getUserinfo(access_token, openid, req, res, params) {
                             //2.查询不需同步完成，API出口
 
                             req.session.openid = params.openid;
-                            res.redirect(params.redirecturl);
+                            
 
                         } else {
                             //同步用户信息
@@ -149,7 +152,7 @@ function getUserinfo(access_token, openid, req, res, params) {
 
                                     //3.查询同步完成，API出口
                                     req.session.openid = params.openid;
-                                    res.redirect(params.redirecturl);
+                                    
                                 })
                                 .catch(params.next);
                         }

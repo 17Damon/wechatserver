@@ -106,6 +106,7 @@ server.all('/test88', function (req, res, next) {
     let params = {};
     params.next = next;
     params.redirecturl = '/test2';
+    console.log(req.session.openid);
     if(req.session.openid){
         res.redirect(params.redirecturl);
     }else {
