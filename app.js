@@ -106,7 +106,11 @@ server.all('/test88', function (req, res, next) {
     let params = {};
     params.next = next;
     params.redirecturl = '/test2';
-    baseController(req, res, 'user', 'checkSyncUserInfo',params);
+    if(req.session.openid){
+        res.redirect(params.redirecturl);
+    }else {
+        baseController(req, res, 'user', 'checkSyncUserInfo',params);
+    }
 });
 
 server.all('/test99', function (req, res, next) {
