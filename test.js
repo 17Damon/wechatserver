@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'production';
-var fs = require("fs"),
+var fs = require('graceful-fs'),
     gulp = require('gulp'),
     browserify = require("browserify");
 

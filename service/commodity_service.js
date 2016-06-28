@@ -1,5 +1,5 @@
 /**
- * Created by zhubg on 2016/4/24.
+ * Created by zhubg on 2016/6/25.
  */
 
 'use strict';
@@ -8,23 +8,23 @@
 module.paths.push('./dao');
 var baseDao = require('base_dao');
 
-//UserService
-function userService(req, res, module, method, params) {
+//CommodityService
+function commodityService(req, res, module, method, params) {
     //some code
 
     //promise
-    console.log('userService');
+    console.log('commodityService');
     return service[method](req, res, module, method, params);
 }
 
 //功能Service--start--
 var service = {};
 
-//getUserByOpenid
-service.getUserByOpenid = function (req, res, module, method, params) {
+//getCommodityById
+service.getCommodityById = function (req, res, module, method, params) {
     //some code
 
-    console.log('UserService-getUserByOpenid');
+    console.log('CommodityService-getCommodityById');
     //promise
     return baseDao(req, res, module, method, params);
 };
@@ -33,7 +33,7 @@ service.getUserByOpenid = function (req, res, module, method, params) {
 service.insert = function (req, res, module, method, params) {
     //some code
 
-    console.log('UserService-insert');
+    console.log('CommodityService-insert');
     //promise
     return baseDao(req, res, module, method, params);
 };
@@ -49,7 +49,7 @@ service.edit = function (req, res, module, method, params) {
 //update
 service.update = function (req, res, module, method, params) {
     //some code
-    console.log('UserService-update');
+    console.log('CommodityService-update');
     //promise
     return baseDao(req, res, module, method, params);
 };
@@ -57,15 +57,15 @@ service.update = function (req, res, module, method, params) {
 //move
 service.move = function (req, res, module, method, params) {
     //some code
-    console.log('UserService-move');
+    console.log('CommodityService-move');
     //promise
     return baseDao(req, res, module, method, params);
 };
 
-//deleteUserByOpenid
-service.deleteUserByOpenid = function (req, res, module, method, params) {
+//deleteCommodityById
+service.deleteCommodityById = function (req, res, module, method, params) {
     //some code
-    console.log('UserService-deleteUserByOpenid');
+    console.log('CommodityService-deleteCommodityById');
 
     //promise
     return baseDao(req, res, module, method, params);
@@ -82,4 +82,4 @@ service.queryAql = function (req, res, module, method, params) {
 //功能Service---end---
 
 //return
-module.exports = userService;
+module.exports = commodityService;

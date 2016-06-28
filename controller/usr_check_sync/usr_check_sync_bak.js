@@ -20,26 +20,27 @@ var underscore = require('underscore');
 //通过code换取网页授权
 function getAccessToken(req, res, module, method, params) {
     let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + appid + `&secret=` + appsecret + `&code=` + req.query.code + `&grant_type=authorization_code`;
-    nodegrass.get(url, function (data, status, headers) {
-        console.log('1.通过code换取网页授权access_token');
-        console.log(status);
-        console.log(headers);
-        console.log(data);
-        let data_json = JSON.parse(data);
-        if (data_json.access_token && data_json.openid) {
-            access_token = data_json.access_token;
-            refresh_token = data_json.refresh_token;
-            openid = data_json.openid;
-    return checkAccessToken(access_token, openid, req, res, params);
-        } else {
-            console.log('获取access_token失败');
-            params.next('微信服务器获取access_token失败异常，请重新打开链接！');
-        }
-    }, null, 'utf8').on('error', function (e) {
-        console.log("Got error: " + e.message);
-        params.next('微信服务器拉取用户信息异常，请重新打开链接！');
+    // nodegrass.get(url, function (data, status, headers) {
+    //     console.log('1.通过code换取网页授权access_token');
+    //     console.log(status);
+    //     console.log(headers);
+    //     console.log(data);
+    //     let data_json = JSON.parse(data);
+    //     if (data_json.access_token && data_json.openid) {
+    //         access_token = data_json.access_token;
+    //         refresh_token = data_json.refresh_token;
+    //         openid = data_json.openid;
+    // return refreshAccessToken('vwRBLoAqhxjwZCsqYlwab1VMFcj9SKO-w7DGsFI5xaNgTvbWdxkr_7kcvOipgat6m8iojTYli9NolR4eFmi9TJBW6VksaE1Jys4Rmps5UQ8', req, res, params);
+    return checkAccessToken('vwRBLoAqhxjwZCsqYlwab6OCWvBzqwzjVsTVKs5WbUUJGWIXnDI4oVfBox1rJWflQV05pqDRPJ9bRkCx8qG-SomsZpeFMicJmtT0MebHx_s', 'o7CarwEfoKMx_tWSo54kKFPtkgYA', req, res, params);
+    //     } else {
+    //         console.log('获取access_token失败');
+    // params.next('微信服务器获取access_token失败异常，请重新打开链接！');
+    //     }
+    // }, null, 'utf8').on('error', function (e) {
+    //     console.log("Got error: " + e.message);
+    // params.next('微信服务器拉取用户信息异常，请重新打开链接！');
 
-    });
+    // });
 }
 
 //检验授权凭证（access_token）是否有效

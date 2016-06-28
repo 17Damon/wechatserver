@@ -1,5 +1,5 @@
 /**
- * Created by zhubg on 2016/4/24.
+ * Created by zhubg on 2016/6/27.
  */
 
 'use strict';
@@ -8,23 +8,23 @@
 module.paths.push('./dao');
 var baseDao = require('base_dao');
 
-//UserService
-function userService(req, res, module, method, params) {
+//PerformerService
+function performerService(req, res, module, method, params) {
     //some code
 
     //promise
-    console.log('userService');
+    console.log('performerService');
     return service[method](req, res, module, method, params);
 }
 
 //功能Service--start--
 var service = {};
 
-//getUserByOpenid
-service.getUserByOpenid = function (req, res, module, method, params) {
+//getPerformerById
+service.getPerformerById = function (req, res, module, method, params) {
     //some code
 
-    console.log('UserService-getUserByOpenid');
+    console.log('PerformerService-getPerformerById');
     //promise
     return baseDao(req, res, module, method, params);
 };
@@ -33,7 +33,7 @@ service.getUserByOpenid = function (req, res, module, method, params) {
 service.insert = function (req, res, module, method, params) {
     //some code
 
-    console.log('UserService-insert');
+    console.log('PerformerService-insert');
     //promise
     return baseDao(req, res, module, method, params);
 };
@@ -46,10 +46,20 @@ service.edit = function (req, res, module, method, params) {
     return baseDao(req, res, module, method, params);
 };
 
+
+//supportOnce
+service.supportOnce = function (req, res, module, method, params) {
+    //some code
+    console.log('PerformerService-supportOnce');
+    //promise
+    return baseDao(req, res, module, method, params);
+};
+
+
 //update
 service.update = function (req, res, module, method, params) {
     //some code
-    console.log('UserService-update');
+    console.log('PerformerService-update');
     //promise
     return baseDao(req, res, module, method, params);
 };
@@ -57,15 +67,15 @@ service.update = function (req, res, module, method, params) {
 //move
 service.move = function (req, res, module, method, params) {
     //some code
-    console.log('UserService-move');
+    console.log('PerformerService-move');
     //promise
     return baseDao(req, res, module, method, params);
 };
 
-//deleteUserByOpenid
-service.deleteUserByOpenid = function (req, res, module, method, params) {
+//deletePerformerById
+service.deletePerformerById = function (req, res, module, method, params) {
     //some code
-    console.log('UserService-deleteUserByOpenid');
+    console.log('PerformerService-deletePerformerById');
 
     //promise
     return baseDao(req, res, module, method, params);
@@ -82,4 +92,4 @@ service.queryAql = function (req, res, module, method, params) {
 //功能Service---end---
 
 //return
-module.exports = userService;
+module.exports = performerService;

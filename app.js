@@ -1,14 +1,16 @@
 'use strict';
 
 var nodeWeixinAuth = require('node-weixin-auth');
-var baseController = require('./controller/base_controller');
+var favicon = require('serve-favicon');
 var path = require('path');
 //与微信对接服务器的验证
 var errors = require('web-errors').errors;
 var express = require('express');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 var server = express();
-var params = {};
+var baseController = require('./controller/base_controller');
+
 
 //开启gzip
 var compression = require('compression');
@@ -16,7 +18,16 @@ var compression = require('compression');
 // compress all requests
 server.use(compression());
 
-// add all routes
+var sess = {
+    secret: 'keyboard cat',
+    cookie: {}
+};
+// if (app.get('env') === 'production') {
+//     app.set('trust proxy', 1) // trust first proxy
+//     sess.cookie.secure = true // serve secure cookies
+// }
+
+server.use(session(sess));
 
 // Make sure to include the babel transpiler
 require("babel-register");
@@ -29,7 +40,8 @@ server.set('view engine', 'ejs');
 
 server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
-
+//图标
+server.use(favicon(__dirname + '/public/favicon.ico'));
 
 // 微信服务器返回的ack信息是HTTP的GET方法实现的
 server.get('/ack', function (req, res, next) {
@@ -76,11 +88,12 @@ server.get('/', function (req, res, next) {
 });
 
 //加载主路径
-require('./app/routes/core-routes.js')(server);
+require('./app/routes/core_routes')(server);
+require('./app/routes/support_routes')(server);
 
-server.all('/test', function (req, res, next) {
+server.all('/test88', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
-    //得到CODE
+    // 得到CODE
     var code = req.query.code;
     var state = req.query.state;
     console.log('code:' + code);
@@ -89,23 +102,24 @@ server.all('/test', function (req, res, next) {
         throw 'code不存在，请使用微信客户端登陆！';
     }
 
-    res.render('index', {
-        react: ReactDOM.renderToString(HelloMessage({name: "John"}))
-    });
-    // baseController(req, res, 'user', 'checkSyncUserInfo',params);        
-
-    // params.next = next;
-    //
-    // baseController(req, res, 'user', 'checkSyncUserInfo', params);
-    // baseController(req, res, 'user', 'getUserByOpenid',params)
-    //     .then(obj => {
-    //         //成功响应
-    //         res.json(obj);
-    //         console.log(obj)
-    //     })
-    //     //失败退出
-    //     .catch(next);
+    //初始化params参数集为空
+    let params = {};
+    params.next = next;
+    params.redirecturl = '/test2';
+    baseController(req, res, 'user', 'checkSyncUserInfo',params);
 });
+
+server.all('/test99', function (req, res, next) {
+    // 获取session.openid
+    var openid = req.session.openid;
+    //清除session.openid
+    delete req.session.openid;
+    console.log('openid:' + openid);
+    console.dir(req.session);
+    res.send(openid);
+});
+
+
 
 //处理错误
 server.use((err, req, res, next) => {

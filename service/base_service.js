@@ -7,9 +7,11 @@
 //allService注册
 module.paths.push('./service');
 var service = {};
-service.user = require('user_service.js');
-service.thread = require('thread_service.js');
-service.permission = require('permission_service.js');
+service.user = require('user_service');
+service.thread = require('thread_service');
+service.permission = require('permission_service');
+service.commodity = require('commodity_service');
+service.performer = require('performer_service');
 
 //baseService
 function baseService(req, res, module, method, params) {

@@ -10,7 +10,7 @@ var gulp = require('gulp'),
 //             debug: true,
 //             transform: ['reactify']
 //         }))
-//         //  缩短文件
+//         //  缩短文件 
 //         // .pipe(uglify())
 //         .pipe(gulp.dest('./public/'));
 //

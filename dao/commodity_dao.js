@@ -1,5 +1,5 @@
 /**
- * Created by zhubg on 2016/4/24.
+ * Created by zhubg on 2016/6/25.
  */
 
 'use strict';
@@ -12,52 +12,52 @@ var tokill = {tokill: ['_rev', '_id', '_key']};
 //连接DB
 var db = require('database');
 
-//userDao
-function userDao(req, res, module, method, params) {
+//commodityDao
+function commodityDao(req, res, module, method, params) {
     //code
 
     //promise
-    console.log('userDao');
+    console.log('commodityDao');
     return dao[method](req, res, module, method, params);
 }
 
 //功能Dao--start--
 let dao = {};
 
-//getUserByOpenid
-dao.getUserByOpenid = function (req, res, module, method, params) {
+//getCommodityById
+dao.getCommodityById = function (req, res, module, method, params) {
     //some code
     console.log(JSON.stringify(params));
-    console.log('userDao-getUserByOpenid');
-    if (params.openid) {
-        let openid = params.openid;
-        console.log('openid:' + openid);
+    console.log('commodityDao-getCommodityById');
+    if (params.commodityid) {
+        let commodityid = params.commodityid;
+        console.log('commodityid:' + commodityid);
         var AQL = `
-        For i in user
-            FILTER i.openid == \'` + openid + `\' 
+        For i in commodity
+            FILTER i.commodityid == \'` + commodityid + `\' 
             return UNSET(i,@tokill)
         `;
         console.log('AQL:' + AQL);
 
         //promise
-        return db.query(AQL, tokill)
+        return db.query(AQL, {tokill: ['_rev', '_id', '_key']})
             .then((cursor)=> {
                 return cursor.all()
             });
     } else {
-        throw `params.openid Undefined!Check it!`;
+        throw `params.commodityid Undefined!Check it!`;
     }
 };
 
 //insert
 dao.insert = function (req, res, module, method, params) {
     //some code
-    console.log('userDao-insert');
-    if (params.user) {
-        let user = JSON.stringify(params.user);
+    console.log('commodityDao-insert');
+    if (params.commodity) {
+        let commodity = JSON.stringify(params.commodity);
         var AQL = `
-            INSERT ` + user + `
-            IN user
+            INSERT ` + commodity + `
+            IN commodity
             return NEW
         `;
         console.log('AQL:' + AQL);
@@ -68,7 +68,7 @@ dao.insert = function (req, res, module, method, params) {
                 return cursor.all()
             });
     } else {
-        throw `params.user Undefined!Check it!`;
+        throw `params.commodity Undefined!Check it!`;
     }
 };
 
@@ -76,14 +76,14 @@ dao.insert = function (req, res, module, method, params) {
 dao.update = function (req, res, module, method, params) {
     //some code
     console.log(JSON.stringify(params));
-    console.log('userDao-update');
-    if (params.user ) {
-        let openid = params.user.openid;
+    console.log('commodityDao-update');
+    if (params.commodity ) {
+        let openid = params.commodity.openid;
         console.log('openid:' + openid);
         var AQL = `
-        For i in user
+        For i in commodity
             FILTER i.openid == \'` + openid + `\' 
-            UPDATE i WITH `+JSON.stringify(params.user)+` IN user
+            UPDATE i WITH `+JSON.stringify(params.commodity)+` IN commodity
             return UNSET(i,@tokill)
         `;
         console.log('AQL:' + AQL);
@@ -108,7 +108,7 @@ dao.edit = function (req, res, module, method, params) {
 
 //move
 dao.move = function (req, res, module, method, params) {
-    console.log('userDao-move');
+    console.log('commodityDao-move');
 
     //returns an array of result.
     return db.query(
@@ -123,15 +123,15 @@ dao.move = function (req, res, module, method, params) {
 
 };
 
-//deleteUserByOpenid
-dao.deleteUserByOpenid = function (req, res, module, method, params) {
+//deleteCommodityById
+dao.deleteCommodityById = function (req, res, module, method, params) {
     //some code
     if (params.openid) {
         let openid = params.openid;
         var AQL = `
-            FOR u IN user
+            FOR u IN commodity
             FILTER u.openid == '` + openid + `'
-            REMOVE u IN user
+            REMOVE u IN commodity
             RETURN OLD
         `;
         console.log('AQL:' + AQL);
@@ -142,7 +142,7 @@ dao.deleteUserByOpenid = function (req, res, module, method, params) {
                 return cursor.all()
             });
     } else {
-        throw `params.user Undefined!Check it!`;
+        throw `params.commodity Undefined!Check it!`;
     }
 };
 
@@ -150,7 +150,7 @@ dao.deleteUserByOpenid = function (req, res, module, method, params) {
 dao.queryAql = function (req, res, module, method, params) {
     //some code
 
-    console.log('userDao-queryAql');
+    console.log('commodityDao-queryAql');
     var aqlStr = '199';
     console.log('aqlStr:' + aqlStr);
     var AQL = `
@@ -169,4 +169,4 @@ dao.queryAql = function (req, res, module, method, params) {
 //功能Dao---end---
 
 //return
-module.exports = userDao;
+module.exports = commodityDao;

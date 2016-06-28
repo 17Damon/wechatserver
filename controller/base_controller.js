@@ -2,7 +2,7 @@
  * Created by zhubg on 2016/4/24.
  */
 
-'use strict'
+'use strict';
 
 //加载controller路径
 module.paths.push('./controller');
@@ -12,6 +12,8 @@ var controller = {};
 controller.user = require('user_controller');
 controller.thread = require('thread_controller');
 controller.permission = require('permission_controller');
+controller.commodity = require('commodity_controller');
+controller.performer = require('performer_controller');
 
 //baseController
 //调度指向参数module, method

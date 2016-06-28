@@ -1,18 +1,24 @@
 <!doctype html>
 <html>
   <head>
-    <title>React Isomorphic Server Side Rendering Example</title>
+    <title>ElfDragonTech</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--宽度为设备宽度，初始缩放比例为 1 倍，禁止用户缩放-->
+    <meta id="viewport" name="viewport" content="initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
     <link href='/index.css' rel="stylesheet">
   </head>
   <body>
-	<h1 id="main-title">Isomorphic Server Side Rendering with React</h1>
-      <div id="react-main-mount"><%-reactOutput%></div>
+      <div id="react-main-mount" style="display: flex;flex-direction: row;justify-content: center;align-items: center" ><%-reactOutput%></div>
+
     <script type="text/javascript">
       // 传递服务端状态
-      var initProps = {num:<%-num%>};
+      var initProps={completeParams:<%-completeParams%>};
+      <!--initProps.commodity = ;-->
     </script>
 
 	<!-- comment out main.js to see server side only rendering -->
-	<script src="/main.js" defer async="true" ></script>
+	  <script src="/main.js" defer async="true" ></script>
+
   </body>
 </html>
