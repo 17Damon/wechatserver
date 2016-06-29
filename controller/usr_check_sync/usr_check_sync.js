@@ -125,8 +125,7 @@ function getUserinfo(access_token, openid, req, res, params) {
                             //失败退出
                             .catch(params.next);
                         // throw 'no user found!';
-                    } else if (obj.length === 1) {
-                        delete obj[0].code;
+                    } else if (obj.length === 1 && obj[0].code === req.query.code) {
                         console.log(`本地数据库已存在该用户记录信息，下面进行比较确定是否需要同步`);
                         console.log("数据库记录比对结果: "+underscore.isEqual(obj[0], data_json));
                         if (underscore.isEqual(obj[0], data_json)) {
