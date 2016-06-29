@@ -126,6 +126,8 @@ server.all('/test88', function (req, res, next) {
                     } else if(obj.length === 1){
                         //将获取到的openid存入session
                         req.session.openid = obj[0].openid;
+                        console.log('look session：');
+                        console.dir(req.session);
                         res.redirect(params.redirecturl);
                     }else {
                         //不可能
