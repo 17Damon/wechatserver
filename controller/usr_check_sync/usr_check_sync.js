@@ -17,27 +17,27 @@ var underscore = require('underscore');
 //通过code换取网页授权
 function getAccessToken(req, res, module, method, params) {
     let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + appid + `&secret=` + appsecret + `&code=` + req.query.code + `&grant_type=authorization_code`;
-        nodegrass.get(url, function (data, status, headers) {
-            console.log('1.通过code换取网页授权access_token');
-            console.log(status);
-            console.log(headers);
-            console.log(data);
-            let data_json = JSON.parse(data);
-            if (data_json.access_token && data_json.openid) {
-                req.session.access_token = data_json.access_token;
-                req.session.refresh_token = data_json.refresh_token;
-                req.session.code = req.query.code;
-                //将获取到的openid存入session
-                req.session.openid = data_json.openid;
-                return checkAccessToken(req.session.access_token, req.session.openid, req, res, params);
-            } else {
-                console.log('获取access_token失败');
-                params.next('微信服务器获取access_token失败异常，请重新打开链接！');
-            }
-        }, null, 'utf8').on('error', function (e) {
-            console.log("Got error: " + e.message);
-            params.next('微信服务器拉取用户信息异常，请重新打开链接！');
-        });
+    nodegrass.get(url, function (data, status, headers) {
+        console.log('1.通过code换取网页授权access_token');
+        console.log(status);
+        console.log(headers);
+        console.log(data);
+        let data_json = JSON.parse(data);
+        if (data_json.access_token && data_json.openid) {
+            req.session.access_token = data_json.access_token;
+            req.session.refresh_token = data_json.refresh_token;
+            req.session.code = req.query.code;
+            //将获取到的openid存入session
+            req.session.openid = data_json.openid;
+            return checkAccessToken(req.session.access_token, req.session.openid, req, res, params);
+        } else {
+            console.log('获取access_token失败');
+            params.next('微信服务器获取access_token失败异常，请重新打开链接！');
+        }
+    }, null, 'utf8').on('error', function (e) {
+        console.log("Got error: " + e.message);
+        params.next('微信服务器拉取用户信息异常，请重新打开链接！');
+    });
 }
 
 //检验授权凭证（access_token）是否有效
@@ -125,17 +125,29 @@ function getUserinfo(access_token, openid, req, res, params) {
                             //失败退出
                             .catch(params.next);
                         // throw 'no user found!';
-                    } else if (obj.length === 1 && obj[0].code === req.query.code) {
+                    } else if (obj.length === 1) {
+                        delete obj[0].code;
                         console.log(`本地数据库已存在该用户记录信息，下面进行比较确定是否需要同步`);
-                        console.log("数据库记录比对结果: "+underscore.isEqual(obj[0], data_json));
+                        console.log("数据库记录比对结果: " + underscore.isEqual(obj[0], data_json));
                         if (underscore.isEqual(obj[0], data_json)) {
-                            //不同步用户信息
-                            console.log('用户信息未发生改变，不需要同步！');
-                            
-                            //2.查询不需同步完成，API出口
-                            res.redirect(params.redirecturl);
-
-
+                            //同步CODE
+                            //存入openid
+                            params.openid = obj[0].openid;
+                            params.code = req.query.code;
+                            return baseServirce(req, res, 'user', 'updateCode', params)
+                                .then(obj => {
+                                    //成功响应
+                                    if(obj.length === 1){
+                                        //不同步用户信息
+                                        console.log('用户信息未发生改变，仅同步Code！');
+                                        //2.查询不需同步完成，API出口
+                                        res.redirect(params.redirecturl);
+                                    }else {
+                                        params.next('同步Code失败！');
+                                    }
+                                })
+                                //失败退出
+                                .catch(params.next);
                         } else {
                             //同步用户信息
                             console.log('用户信息发生改变，需要同步！');

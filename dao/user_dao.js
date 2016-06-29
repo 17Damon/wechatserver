@@ -97,18 +97,46 @@ dao.insert = function (req, res, module, method, params) {
     }
 };
 
+//updateCode
+dao.updateCode = function (req, res, module, method, params) {
+    //some code
+    console.dir(params);
+    console.log('userDao-updateCode');
+    if (params.openid && params.code) {
+        let openid = params.openid;
+        let code = params.code;
+        console.log('code:' + code);
+        console.log('openid:' + openid);
+        var AQL = `
+        For i in user
+            FILTER i.openid == \'` + openid + `\' 
+            UPDATE i WITH {code: ` + code + ` } IN user
+            return UNSET(NEW,@tokill)
+        `;
+        console.log('AQL:' + AQL);
+
+        //promise
+        return db.query(AQL, tokill)
+            .then((cursor)=> {
+                return cursor.all()
+            });
+    } else {
+        throw `params.openid or params.code Undefined!Check it!`;
+    }
+};
+
 //update
 dao.update = function (req, res, module, method, params) {
     //some code
     console.log(JSON.stringify(params));
     console.log('userDao-update');
-    if (params.user ) {
+    if (params.user) {
         let openid = params.user.openid;
         console.log('openid:' + openid);
         var AQL = `
         For i in user
             FILTER i.openid == \'` + openid + `\' 
-            UPDATE i WITH `+JSON.stringify(params.user)+` IN user
+            UPDATE i WITH ` + JSON.stringify(params.user) + ` IN user
             return UNSET(i,@tokill)
         `;
         console.log('AQL:' + AQL);
@@ -122,6 +150,7 @@ dao.update = function (req, res, module, method, params) {
         throw `params.openid Undefined!Check it!`;
     }
 };
+
 
 //edit
 dao.edit = function (req, res, module, method, params) {
