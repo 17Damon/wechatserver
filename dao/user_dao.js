@@ -110,7 +110,7 @@ dao.updateCode = function (req, res, module, method, params) {
         var AQL = `
         For i in user
             FILTER i.openid == \'` + openid + `\' 
-            UPDATE i WITH {code: ` + code + ` } IN user
+            UPDATE i WITH {code: \'` + code + `\' } IN user
             return UNSET(NEW,@tokill)
         `;
         console.log('AQL:' + AQL);
