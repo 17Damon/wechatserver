@@ -7,6 +7,9 @@ var baseController = require('../../controller/base_controller');
 module.exports = function (server) {
     server.get('/test2', function (req, res, next) {
         // React.renderToString takes your component
+        if( !req.query.code || !req.session.openid){
+            res.send('请使用微信客户端登陆!');
+        }
         let performer = {};
         //获取session.openid  B,F,H,J
         let openid = req.session.openid;
