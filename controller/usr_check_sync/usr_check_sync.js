@@ -17,7 +17,6 @@ var underscore = require('underscore');
 //通过code换取网页授权
 function getAccessToken(req, res, module, method, params) {
     let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=` + appid + `&secret=` + appsecret + `&code=` + req.query.code + `&grant_type=authorization_code`;
-    if (!req.session.access_token || !req.session.openid ){
         nodegrass.get(url, function (data, status, headers) {
             console.log('1.通过code换取网页授权access_token');
             console.log(status);
@@ -27,6 +26,8 @@ function getAccessToken(req, res, module, method, params) {
             if (data_json.access_token && data_json.openid) {
                 req.session.access_token = data_json.access_token;
                 req.session.refresh_token = data_json.refresh_token;
+                req.session.code = req.query.code;
+                //将获取到的openid存入session
                 req.session.openid = data_json.openid;
                 return checkAccessToken(req.session.access_token, req.session.openid, req, res, params);
             } else {
@@ -37,9 +38,6 @@ function getAccessToken(req, res, module, method, params) {
             console.log("Got error: " + e.message);
             params.next('微信服务器拉取用户信息异常，请重新打开链接！');
         });
-    }else {
-        return checkAccessToken(req.session.access_token, req.session.openid, req, res, params);
-    }
 }
 
 //检验授权凭证（access_token）是否有效
@@ -106,49 +104,52 @@ function getUserinfo(access_token, openid, req, res, params) {
             // return resCustom(data_json);
             console.log('拉取用户信息成功！');
             console.log(data_json);
-            params.openid = 'o7CarwEfoKMx_tWSo54kKFPtkgYA';
+            params.openid = openid;
             return baseServirce(req, res, 'user', 'getUserByOpenid', params)
                 .then(obj => {
                     //成功响应
                     if (obj.length === 0) {
                         //本地数据库不存在该用户信息,现在存入
                         params.user = data_json;
+                        //将code存入
+                        params.user.code = req.query.code;
                         return baseServirce(req, res, 'user', 'insert', params)
                             .then(obj => {
                                 //存入本地数据库成功
                                 console.log(`存入本地数据库成功!`);
 
                                 //1.查询同步完成，API出口
-                                req.session.openid = params.openid;
-                                
+                                res.redirect(params.redirecturl);
 
                             })
                             //失败退出
                             .catch(params.next);
                         // throw 'no user found!';
                     } else if (obj.length === 1) {
+                        delete obj[0].code;
                         console.log(`本地数据库已存在该用户记录信息，下面进行比较确定是否需要同步`);
                         console.log("数据库记录比对结果: "+underscore.isEqual(obj[0], data_json));
                         if (underscore.isEqual(obj[0], data_json)) {
                             //不同步用户信息
                             console.log('用户信息未发生改变，不需要同步！');
-                            //2.查询不需同步完成，API出口
-
-                            req.session.openid = params.openid;
                             
+                            //2.查询不需同步完成，API出口
+                            res.redirect(params.redirecturl);
+
 
                         } else {
                             //同步用户信息
                             console.log('用户信息发生改变，需要同步！');
                             params.user = data_json;
+                            //将code存入
+                            params.user.code = req.query.code;
                             return baseServirce(req, res, 'user', 'update', params)
                                 .then(obj => {
                                     //用户信息同步完成
                                     console.log('用户信息同步完成！');
 
                                     //3.查询同步完成，API出口
-                                    req.session.openid = params.openid;
-                                    
+                                    res.redirect(params.redirecturl);
                                 })
                                 .catch(params.next);
                         }

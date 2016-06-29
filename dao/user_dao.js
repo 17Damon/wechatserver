@@ -49,6 +49,31 @@ dao.getUserByOpenid = function (req, res, module, method, params) {
     }
 };
 
+//getUserByCode
+dao.getUserByCode = function (req, res, module, method, params) {
+    //some code
+    console.log(JSON.stringify(params));
+    console.log('userDao-getUserByCode');
+    if (params.code) {
+        let code = params.code;
+        console.log('code:' + code);
+        var AQL = `
+        For i in user
+            FILTER i.code == \'` + code + `\' 
+            return UNSET(i,@tokill)
+        `;
+        console.log('AQL:' + AQL);
+
+        //promise
+        return db.query(AQL, tokill)
+            .then((cursor)=> {
+                return cursor.all()
+            });
+    } else {
+        throw `params.code Undefined!Check it!`;
+    }
+};
+
 //insert
 dao.insert = function (req, res, module, method, params) {
     //some code

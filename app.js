@@ -95,7 +95,6 @@ server.all('/test88', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
     //初始化params参数集为空
     let params = {};
-    params.next = next;
     params.redirecturl = '/test2';
     // 得到CODE
     var code = req.query.code;
@@ -105,20 +104,36 @@ server.all('/test88', function (req, res, next) {
     if (code === undefined) {
         throw 'code不存在，请使用微信客户端登陆！';
     }
-    console.log('up: ' + req.session.code);
-    if (!req.session.code) {
-        console.log('first time!');
-        req.session.code = code;
-        baseController(req, res, 'user', 'checkSyncUserInfo', params);
-    }
-    console.log('down: ' + req.session.code);
-    console.log('many time!');
+    console.log('look session：');
     console.dir(req.session);
+    
+    console.log('up: ' + req.session.code);
 
-    if (req.session.openid) {
+    if ((req.session.code === code && req.session.openid) || req.session.openid) {
+        console.log('many time!');
+        console.dir(req.session);
+        //session中存在opendi直接跳转
         res.redirect(params.redirecturl);
-    } else {
-        res.send('wechat fuck');
+    }else {
+        console.log('first time!');
+        params.code = code;
+            baseController(req, res, 'user', 'getUserByCode', params)
+                .then(obj => {
+                    //成功响应
+                    if (obj.length === 0){
+                        params.next = next;
+                        baseController(req, res, 'user', 'checkSyncUserInfo', params);
+                    } else if(obj.length === 1){
+                        //将获取到的openid存入session
+                        req.session.openid = obj[0].openid;
+                        res.redirect(params.redirecturl);
+                    }else {
+                        //不可能
+                        res.send('Ghost is coming!')
+                    }
+                })
+                //失败退出
+                .catch(params.next);
     }
 });
 

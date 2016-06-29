@@ -29,6 +29,15 @@ service.getUserByOpenid = function (req, res, module, method, params) {
     return baseDao(req, res, module, method, params);
 };
 
+//getUserByCode
+service.getUserByCode = function (req, res, module, method, params) {
+    //some code
+
+    console.log('UserService-getUserByCode');
+    //promise
+    return baseDao(req, res, module, method, params);
+};
+
 //insert
 service.insert = function (req, res, module, method, params) {
     //some code

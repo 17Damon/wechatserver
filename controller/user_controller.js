@@ -40,6 +40,15 @@ controller.getUserByOpenid = function (req,res,module,method, params) {
     return baseServirce(req,res,module,method, params);
 };
 
+//getUserByCode
+controller.getUserByCode = function (req,res,module,method, params) {
+    //some code
+
+    console.log('userController-getUserByCode');
+    //promise
+    return baseServirce(req,res,module,method, params);
+};
+
 //insert
 controller.insert = function (req,res,module,method, params) {
     //some code
