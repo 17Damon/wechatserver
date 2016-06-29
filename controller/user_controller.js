@@ -62,11 +62,19 @@ controller.insert = function (req,res,module,method, params) {
 controller.update = function (req,res,module,method, params) {
     //some code
 
-    console.log('userController-insert');
+    console.log('userController-update');
     //promise
     return baseServirce(req,res,module,method, params);
 };
 
+//updateCode
+controller.updateCode = function (req,res,module,method, params) {
+    //some code
+
+    console.log('userController-updateCode');
+    //promise
+    return baseServirce(req,res,module,method, params);
+};
 
 //edit
 controller.edit = function (req,res,module,method, params) {

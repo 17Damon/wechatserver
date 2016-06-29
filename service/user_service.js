@@ -63,6 +63,14 @@ service.update = function (req, res, module, method, params) {
     return baseDao(req, res, module, method, params);
 };
 
+//updateCode
+service.updateCode = function (req, res, module, method, params) {
+    //some code
+    console.log('UserService-updateCode');
+    //promise
+    return baseDao(req, res, module, method, params);
+};
+
 //move
 service.move = function (req, res, module, method, params) {
     //some code
