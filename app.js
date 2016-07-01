@@ -1,4 +1,10 @@
+/**
+ * Created by zhubg on 2016/6/28.
+ */
+
 'use strict';
+
+// process.env.NODE_ENV = 'production';
 
 var nodeWeixinAuth = require('node-weixin-auth');
 var favicon = require('serve-favicon');
@@ -7,7 +13,11 @@ var path = require('path');
 var errors = require('web-errors').errors;
 var express = require('express');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+//session
+var session = require("express-session");
+
+
+
 var server = express();
 var baseController = require('./controller/base_controller');
 
@@ -20,14 +30,26 @@ server.use(compression());
 
 var sess = {
     secret: 'keyboard cat',
-    cookie: {}
+    cookie: {},
+    saveUninitialized: true,
+    resave: true
 };
-// if (app.get('env') === 'production') {
-//     app.set('trust proxy', 1) // trust first proxy
-//     sess.cookie.secure = true // serve secure cookies
-// }
 
+//使用Session
 server.use(session(sess));
+// app.use(express.session({
+//     secret: 'a4f8071f-c873-4447-8ee2',
+//     cookie: { maxAge: 2628000000 },
+//     store: new (require('express-sessions'))({
+//         storage: 'mongodb',
+//         instance: mongoose, // optional
+//         host: 'localhost', // optional
+//         port: 27017, // optional
+//         db: 'test', // optional
+//         collection: 'sessions', // optional
+//         expire: 86400 // optional
+//     })
+// }));
 
 // Make sure to include the babel transpiler
 require("babel-register");
@@ -91,13 +113,14 @@ server.get('/', function (req, res, next) {
 require('./app/routes/core_routes')(server);
 require('./app/routes/support_routes')(server);
 
-server.all('/test88', function (req, res, next) {
+server.all('/btw:performerid', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
     //初始化params参数集为空
     let params = {};
     params.redirecturl = '/test2';
     // 得到CODE
     var code = req.query.code;
+    req.session.performerid = req.params.performerid;
     var state = req.query.state;
     console.log('code:' + code);
     console.log('state:' + state);
@@ -106,7 +129,7 @@ server.all('/test88', function (req, res, next) {
     }
     console.log('look session：');
     console.dir(req.session);
-    
+
     console.log('up: ' + req.session.code);
 
     if ((req.session.code === code && req.session.openid) || req.session.openid) {
@@ -114,39 +137,41 @@ server.all('/test88', function (req, res, next) {
         console.dir(req.session);
         //session中存在opendi直接跳转
         res.redirect(params.redirecturl);
-    }else {
+    } else {
         console.log('first time!');
         params.code = code;
-            baseController(req, res, 'user', 'getUserByCode', params)
-                .then(obj => {
-                    //成功响应
-                    if (obj.length === 0){
-                        params.next = next;
-                        baseController(req, res, 'user', 'checkSyncUserInfo', params);
-                    } else if(obj.length === 1){
-                        //将获取到的openid存入session
-                        req.session.openid = obj[0].openid;
-                        console.log('look session：');
-                        console.dir(req.session);
-                        res.redirect(params.redirecturl);
-                    }else {
-                        //不可能
-                        res.send('Ghost is coming!')
-                    }
-                })
-                //失败退出
-                .catch(params.next);
+        baseController(req, res, 'user', 'getUserByCode', params)
+            .then(obj => {
+                //成功响应
+                if (obj.length === 0) {
+                    params.next = next;
+                    baseController(req, res, 'user', 'checkSyncUserInfo', params);
+                } else if (obj.length === 1) {
+                    //将获取到的openid存入session
+                    req.session.openid = obj[0].openid;
+                    console.log('look session：');
+                    console.dir(req.session);
+                    res.redirect(params.redirecturl);
+                } else {
+                    //不可能
+                    res.send('Ghost is coming!')
+                }
+            })
+            //失败退出
+            .catch(params.next);
     }
 });
 
-server.all('/test99', function (req, res, next) {
-    // 获取session.openid
-    var openid = req.session.openid;
-    //清除session.openid
-    delete req.session.openid;
-    console.log('openid:' + openid);
-    console.dir(req.session);
-    res.send(openid);
+server.all('/test99:testid', function (req, res, next) {
+    // // 获取session.openid
+    // var openid = req.session.openid;
+    // //清除session.openid
+    // delete req.session.openid;
+    // console.log('openid:' + openid);
+    // console.dir(req.session);
+    let testid = req.params.testid;
+    console.log(testid);
+    res.send(testid);
 });
 
 

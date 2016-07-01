@@ -5,9 +5,9 @@ var baseController = require('../../controller/base_controller');
 
 
 module.exports = function (server) {
-    server.get('/test2', function (req, res, next) {
+    server.get('/btw/performer', function (req, res, next) {
         // React.renderToString takes your component
-        if(!req.session.openid){
+        if(!req.session.openid && req.session.performerid){
             res.send('请使用微信客户端登陆!');
         }else {
             let performer = {};
@@ -15,7 +15,7 @@ module.exports = function (server) {
             let openid = req.session.openid;
             //初始化params参数集为空
             let params = {};
-            params.performerid = '000001';
+            params.performerid = req.session.performerid;
             baseController(req, res, 'performer', 'getPerformerById', params)
                 .then(obj=> {
                     performer = obj[0];

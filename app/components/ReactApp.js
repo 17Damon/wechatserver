@@ -16,7 +16,7 @@ var ReactApp = React.createClass({
         }
         if(self.fetch) {
             // run my fetch request here
-            let url = `/test?performerid=`+ 
+            let url = `/btw/performer/support?performerid=`+ 
                 this.props.completeParams.performer.performerid +`&openid=`+
                 this.props.completeParams.openid;
             fetch(url)
