@@ -64,6 +64,7 @@ RETURN UNSET(merge(p, {commodity: c[0]},{owneruser: u[0]},{supportlist: su}), ['
                 return cursor.all()
             });
     } else {
+        console.log(`params.performerid Undefined!Check it!`);
         throw `params.performerid Undefined!Check it!`;
     }
 };
