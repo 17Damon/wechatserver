@@ -7,8 +7,8 @@ var baseController = require('../../controller/base_controller');
 module.exports = function (server) {
     server.get('/btw/performer', function (req, res, next) {
         // React.renderToString takes your component
-        if(!req.session.openid && req.session.performerid){
-            res.send('请使用微信客户端登陆!');
+        if(!req.session.openid && !req.session.performerid){
+            res.send('非法路径,请使用微信客户端登陆!');
         }else {
             let performer = {};
             //获取session.openid  B,F,H,J
