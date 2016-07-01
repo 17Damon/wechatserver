@@ -117,7 +117,7 @@ server.all('/btw:performerid', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
     //初始化params参数集为空
     let params = {};
-    params.redirecturl = '/test2';
+    params.redirecturl = '/btw/performer';
     // 得到CODE
     var code = req.query.code;
     req.session.performerid = req.params.performerid;
