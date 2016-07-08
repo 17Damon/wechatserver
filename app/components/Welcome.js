@@ -172,7 +172,7 @@ var Welcome = React.createClass({
                         marginLeft:this.state.windowWidth*0.38
                         // marginTop:this.state.windowHeight*0.1
                         }}
-                            src="/4615.jpg"/>
+                            src="/4615.png"/>
                         <audio src="/xqyycsd.mp3" autoPlay="autoplay" loop="loop">
                             您的浏览器不支持 audio 标签。
                         </audio>
