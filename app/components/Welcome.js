@@ -169,13 +169,12 @@ var Welcome = React.createClass({
                         width:(this.state.opacity1 < 0)?this.state.windowWidth/4:0,
                         height:(this.state.opacity1 < 0)?this.state.windowHeight/7:0,
                         opacity:this.state.opacity2,
-                        marginLeft:this.state.windowWidth*0.38
+                        marginLeft:this.state.windowWidth*0.38,
+                        borderRadius:10
                         // marginTop:this.state.windowHeight*0.1
                         }}
                             src="/4615.png"/>
-                        <audio src="/xqyycsd.mp3" autoPlay="autoplay" loop="loop">
-                            您的浏览器不支持 audio 标签。
-                        </audio>
+
                     </div>
                     <div
                         style={{
@@ -204,6 +203,9 @@ var Welcome = React.createClass({
                         marginTop:-(this.state.windowHeight/2)
                         }}
                             src="/12345.png"/>
+                        <audio src="/xqyycsd.mp3" autoPlay="autoplay" loop="loop">
+                            您的浏览器不支持 audio 标签。
+                        </audio>
                     </div>
                 </div>
             </div>
