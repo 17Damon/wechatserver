@@ -112,6 +112,7 @@ server.get('/', function (req, res, next) {
 //加载主路径
 require('./app/routes/core_routes')(server);
 require('./app/routes/support_routes')(server);
+require('./app/routes/welcome_routes')(server);
 
 server.all('/btw:performerid', function (req, res, next) {
     // res.redirect('https://github.com/miss61008596');
@@ -188,7 +189,7 @@ server.use((err, req, res, next) => {
 });
 
 //server启动80
-var listener = server.listen(80, function () {
+var listener = server.listen(3000, function () {
     let host = listener.address().address;
     let port = listener.address().port;
     console.log('hello,http://' + host + ':' + port);

@@ -1,6 +1,5 @@
 process.env.NODE_ENV = 'production';
 var gulp = require('gulp'),
-    browserify = require('gulp-browserify'),
     uglify = require('gulp-uglify');
 
 // gulp.task('scripts', function () {

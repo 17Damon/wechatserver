@@ -1,6 +1,7 @@
 
 var ReactDOM  =require('react-dom');
-var ReactApp = require('./components/ReactApp');
+// var ReactApp = require('./components/ReactApp');
+var ReactApp = require('./components/Welcome');
 var mountNode = document.getElementById('react-main-mount');
 
 //客户端同构渲染参数initProps.num
