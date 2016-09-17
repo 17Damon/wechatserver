@@ -97,7 +97,7 @@ server.get('/', function (req, res, next) {
 <body>
 <div style="display: flex;flex-direction: row;justify-content: center;align-items: center">
 <div style="display: flex">
-<img style="width: 160px;height: 160px;border-radius: 80px;margin-right: 20px" src="http://120.27.124.108:10255/222.jpg" />
+<img style="width: 160px;height: 160px;border-radius: 80px;margin-right: 20px" src="https://avatars2.githubusercontent.com/u/6361237?v=3&s=466" />
 </div>
 <div style="display: flex;flex-direction: column;">
 <h1>个人技术分享</h1>
